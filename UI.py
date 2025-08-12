@@ -9,6 +9,11 @@ def on_item_select(event):
         entry_var.set(item)
         add_log(f"Selected '{item}'")
 
+def on_eval():
+    val = entry_var.get()
+    add_log(f"{val} evaluated as: {eval(val)}")
+
+
 def on_save():
     name = entry_var.get()
     if name.strip() and (name.strip() not in saved_expressions):
@@ -90,7 +95,7 @@ entry.grid(row=0, column=1, pady=5, sticky="ew")
 save_btn = ttk.Button(right_frame, text="Save as expression", command=on_save)
 save_btn.grid(row=1, column=0, pady=10, sticky="w")
 
-eval_btn = ttk.Button(right_frame, text="Eval", command= lambda: add_log(f"{entry_var.get()} evaluated as: {eval(entry_var.get())}")) #horrifically insecure, but looks cool
+eval_btn = ttk.Button(right_frame, text="Eval", command= on_eval) #horrifically insecure, but looks cool
 eval_btn.grid(row=1, column=1, pady=10, sticky="n")
 
 exit_btn = ttk.Button(right_frame, text="Exit", command=on_exit)
