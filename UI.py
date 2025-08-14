@@ -1,6 +1,9 @@
 import tkinter as tk
 from tkinter import scrolledtext, ttk, messagebox
+import customtkinter
+from customtkinter import CTkInputDialog, CTkToplevel
 import time
+
 
 def on_item_select(event):
     selected = listbox.curselection()
@@ -9,37 +12,66 @@ def on_item_select(event):
         entry_var.set(item)
         add_log(f"Selected '{item}'")
 
-def on_eval():
-    val = entry_var.get()
-    add_log(f"{val} evaluated as: {eval(val)}")
+def execute():
+    to_ex = listbox.get(listbox.curselection()[0])
+    val = entry_var.get() 
+    if val: #if there is a scan slelcted
+        if val in ["AWS_scan", "Azure_scan"]:
+            cloud_provider_login_window()
+        else:
+            add_log(f"{val} results as follows: \nlorum ipsum \nqwerty \n1234\n")
 
 
 def on_save():
-    name = entry_var.get()
-    if name.strip() and (name.strip() not in saved_expressions):
-        listbox.insert("end", name)
-        saved_expressions.append(name.strip())
-        add_log(f"Saved '{name}' successfully!")
+    if log_box.get("1.0", "end-1c"): #if there is logged content
+        name = file_name_query()
+        if name:
+            add_log(f"Saved to file '{name}' successfully!")
 
-    elif name.strip():
-        messagebox.showwarning("Warning", "Item already exists")
+        else:
+            add_log("Save cancelled")
 
-    else:
-        messagebox.showwarning("Warning", "Field cannot be empty.")
 
 def add_log(message):
     # Enable temporarily to insert text
     log_box.configure(state="normal")
-    log_box.insert(tk.END, f"{message}\n")
+    log_box.insert(tk.END, f"{time_now()} - {message}\n")
     log_box.see(tk.END)  # Auto-scroll to bottom
     log_box.configure(state="disabled")
 
 def time_now():
     t = time.localtime()
-    return f"{t.tm_hour}:{t.tm_min}"
+    return f"{t.tm_hour}:{t.tm_min}:{t.tm_sec}"
 
 def on_exit():
     root.destroy()
+
+def file_name_query():
+    dialog = CTkInputDialog(text="Enter name of file to be saved", title="Save file") #possibly should add check to see if file exists and warning if overwriting
+    return dialog.get_input()
+
+def cloud_provider_login_window():
+    window = CTkToplevel(root)
+    window.title("Cloud login")
+    window.resizable(False,False)
+    window.attributes("-topmost", True)
+
+    label = customtkinter.CTkLabel(window, text="Enter login details")
+    label.grid(row=0, column=0, columnspan=2, padx=20, pady=20, sticky="ew")
+
+    eusr = customtkinter.CTkEntry(window,placeholder_text="Username:")
+    eusr.grid(row=1, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
+
+    epswd = customtkinter.CTkEntry(window,placeholder_text="Password:")
+    epswd.grid(row=2, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
+
+    ok = customtkinter.CTkButton(window, text="Ok")
+    ok.grid(row=5,column=0, padx=(20, 10), pady=(0, 20))
+
+    cancel = customtkinter.CTkButton(window, text="Cancel")
+    cancel.grid(row=5,column=1, padx=(10, 20), pady=(0, 20))
+    pass
+
 
 # Main window
 root = tk.Tk()
@@ -60,7 +92,7 @@ filemenu.add_command(label="Exit", command=on_exit)
 menubar.add_cascade(label="File", menu=filemenu)
 
 helpmenu = tk.Menu(menubar, tearoff=0)
-helpmenu.add_command(label="About", command=lambda: messagebox.showinfo("About", "Sample Tkinter App v1.0"))
+helpmenu.add_command(label="About", command=lambda: messagebox.showinfo("About", "Yep, still a WIP"))
 menubar.add_cascade(label="Help", menu=helpmenu)
 
 root.config(menu=menubar)
@@ -73,13 +105,23 @@ content_frame.pack(fill="both", expand=True, padx=5, pady=5)
 left_frame = ttk.Frame(content_frame, width=200)
 left_frame.pack(side="left", fill="y")
 
-ttk.Label(left_frame, text="Expressions").pack(anchor="w")
+ttk.Label(left_frame, text="Scan types").pack(anchor="w")
 listbox = tk.Listbox(left_frame, height=10)
-listbox.pack(fill="y", expand=True)
+listbox.pack()#(fill="y", expand=True)
 
 
-saved_expressions = ["'hello world'", "3**2", "saved_expressions", "time_now()"]
-for item in saved_expressions:
+#name to display and function to use. {name: function}
+scan_options = {
+                "Scan_1": 0, 
+                "Scan_2": 0, 
+                "Scan_3": 0, 
+                "Scan_4": 0, 
+                "AWS_scan": 0, 
+                "Azure_scan": 0
+                }
+
+
+for item in scan_options:
     listbox.insert("end", item)
 listbox.bind("<<ListboxSelect>>", on_item_select)
 
@@ -87,18 +129,18 @@ listbox.bind("<<ListboxSelect>>", on_item_select)
 right_frame = ttk.Frame(content_frame)
 right_frame.pack(side="right", fill="both", expand=True, padx=10)
 
-ttk.Label(right_frame, text="Input:").grid(row=0, column=0, sticky="w")
+ttk.Label(right_frame, text="Scan options:").grid(row=0, column=0, sticky="w")
 entry_var = tk.StringVar()
 entry = ttk.Entry(right_frame, textvariable=entry_var)
 entry.grid(row=0, column=1, pady=5, sticky="ew")
 
-save_btn = ttk.Button(right_frame, text="Save as expression", command=on_save)
+save_btn = ttk.Button(right_frame, text="Save log to file", command= on_save)
 save_btn.grid(row=1, column=0, pady=10, sticky="w")
 
-eval_btn = ttk.Button(right_frame, text="Eval", command= on_eval) #horrifically insecure, but looks cool
+eval_btn = ttk.Button(right_frame, text="Scan", command= execute) #horrifically insecure, but looks cool, will fix later
 eval_btn.grid(row=1, column=1, pady=10, sticky="n")
 
-exit_btn = ttk.Button(right_frame, text="Exit", command=on_exit)
+exit_btn = ttk.Button(right_frame, text="Exit", command= on_exit)
 exit_btn.grid(row=1, column=2, pady=10, sticky="e")
 
 log_box = scrolledtext.ScrolledText(
@@ -113,9 +155,5 @@ log_box.grid(row=2,column=0, columnspan=3)
 
 right_frame.columnconfigure(1, weight=1)
 
-# Status bar
-status = tk.StringVar(value="Ready")
-status_bar = ttk.Label(root, textvariable=status, relief="sunken", anchor="w")
-status_bar.pack(side="bottom", fill="x")
 
 root.mainloop()
