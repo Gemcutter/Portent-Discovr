@@ -4,6 +4,8 @@ import customtkinter
 from customtkinter import CTkInputDialog, CTkToplevel
 import time
 
+customtkinter.set_appearance_mode("light")
+
 
 def on_item_select(event):
     selected = listbox.curselection()
@@ -13,13 +15,18 @@ def on_item_select(event):
         add_log(f"Selected '{item}'")
 
 def execute():
-    to_ex = listbox.get(listbox.curselection()[0])
-    val = entry_var.get() 
-    if val: #if there is a scan slelcted
-        if val in ["AWS_scan", "Azure_scan"]:
-            cloud_provider_login_window()
-        else:
-            add_log(f"{val} results as follows: \nlorum ipsum \nqwerty \n1234\n")
+    if listbox.curselection():
+        to_ex = listbox.get(listbox.curselection()[0])
+        val = entry_var.get() 
+        if val: #if there is a scan slelcted
+            if val in ["AWS_scan", "Azure_scan"]:
+                username, password = cloud_provider_login_window()
+                if username and password:
+                    add_log(f"for development purposes the entered username: {username} and password: {password},  this will not be present after this has been properly implimented")
+                else:
+                    add_log("cloud login cancelled by user")
+            else:
+                add_log(f"{val} results as follows: \nlorum ipsum \nqwerty \n1234\n")
 
 
 def on_save():
@@ -51,6 +58,13 @@ def file_name_query():
     return dialog.get_input()
 
 def cloud_provider_login_window():
+    result = {"user": None, "pass": None}
+
+    def ok():
+        result["user"] = eusr.get()
+        result["pass"] = epswd.get()
+        window.destroy()
+
     window = CTkToplevel(root)
     window.title("Cloud login")
     window.resizable(False,False)
@@ -65,12 +79,15 @@ def cloud_provider_login_window():
     epswd = customtkinter.CTkEntry(window,placeholder_text="Password:")
     epswd.grid(row=2, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
 
-    ok = customtkinter.CTkButton(window, text="Ok")
+    ok = customtkinter.CTkButton(window, text="Ok", command= ok)
     ok.grid(row=5,column=0, padx=(20, 10), pady=(0, 20))
 
-    cancel = customtkinter.CTkButton(window, text="Cancel")
+    cancel = customtkinter.CTkButton(window, text="Cancel", command= lambda: window.destroy())
     cancel.grid(row=5,column=1, padx=(10, 20), pady=(0, 20))
-    pass
+
+    window.wait_window()
+    
+    return result["user"], result["pass"]
 
 
 # Main window
@@ -80,7 +97,7 @@ root.geometry("800x500")
 root.resizable(False, False)
 
 iconimage = tk.PhotoImage(file = "Triskele.png")
-root.iconphoto(True, iconimage,)
+root.iconphoto(True, iconimage)
 
 
 # Menu bar
