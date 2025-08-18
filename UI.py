@@ -5,6 +5,8 @@ from customtkinter import CTkInputDialog, CTkToplevel
 import time
 import sys, os
 
+import scanner
+
 
 
 customtkinter.set_appearance_mode("light")
@@ -26,7 +28,7 @@ def execute():
                     add_log("missing username and/or password")
 
             else:
-                add_log(f"{selected_scan} results as follows: \nlorum ipsum \nqwerty \n1234\n")
+                add_log(f"results as follows: {scan_options[selected_scan]()} ")
 
 def on_save():
     if log_box.get("1.0", "end-1c"): #if there is logged content
@@ -132,7 +134,7 @@ left_frame.pack(side="left", fill="y")
 
 #name to display and function to use. {name: function}, no scanning functions are available yet so all are set to -1 and nothing accesses the dict
 scan_options = {
-                "Scan_1": -1, 
+                "Scan_1": scanner.basicAssScan, 
                 "Scan_2": -1, 
                 "Scan_3": -1, 
                 "Scan_4": -1, 
