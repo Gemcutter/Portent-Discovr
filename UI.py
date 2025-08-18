@@ -3,6 +3,8 @@ from tkinter import scrolledtext, ttk, messagebox
 import customtkinter
 from customtkinter import CTkInputDialog, CTkToplevel
 import time
+import sys, os
+
 
 
 customtkinter.set_appearance_mode("light")
@@ -95,7 +97,12 @@ root.title("Discovr")
 root.geometry("800x500")
 root.resizable(False, False)
 
-iconimage = tk.PhotoImage(file = "Triskele.png")
+def resource_path(filename):
+    if hasattr(sys, "_MEIPASS"):  # Running from PyInstaller bundle
+        return os.path.join(sys._MEIPASS, filename)
+    return filename  # Running normally
+
+iconimage = tk.PhotoImage(file=resource_path("Triskele.png"))
 root.iconphoto(True, iconimage)
 
 # Menu bar
