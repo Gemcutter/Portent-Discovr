@@ -177,4 +177,6 @@ log_box.grid(row=2, column=0, columnspan=3)
 right_frame.columnconfigure(1, weight=1)
 
 
-root.mainloop()
+
+if __name__ == "__main__":
+    root.mainloop()
