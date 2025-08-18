@@ -130,7 +130,7 @@ content_frame.pack(fill="both", expand=True, padx=5, pady=5)
 left_frame = ttk.Frame(content_frame, width=200)
 left_frame.pack(side="left", fill="y")
 
-
+#name to display and function to use. {name: function}, no scanning functions are available yet so all are set to -1 and nothing accesses the dict
 scan_options = {
                 "Scan_1": -1, 
                 "Scan_2": -1, 
@@ -142,12 +142,6 @@ scan_options = {
 
 ttk.Label(left_frame, text="Scan type").pack(anchor="w")
 
-
-#name to display and function to use. {name: function}, no scanning functions are available yet so all are set to -1 and nothing accesses the dict
-
-
-
-# TODO change how execute gets its values
 combobox = customtkinter.CTkComboBox(left_frame, values=list(scan_options.keys()), corner_radius=0, border_width=1, border_color="grey")
 combobox.pack()
 
