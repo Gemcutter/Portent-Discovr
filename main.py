@@ -1,5 +1,3 @@
 import UI
-def run():
-    UI.createWindow()
-
-run()
+from UI import root
+root.mainloop()
