@@ -119,7 +119,7 @@ filemenu.add_command(label="Exit", command=on_exit)
 menubar.add_cascade(label="File", menu=filemenu)
 
 helpmenu = tk.Menu(menubar, tearoff=0)
-helpmenu.add_command(label="About", command=lambda: messagebox.showinfo(" ", "You wish")) #empty title due to size restraints
+helpmenu.add_command(label="About", command=lambda: messagebox.showinfo(" ", "You wish")) #empty messagebox title due to size restraints
 menubar.add_cascade(label="Help", menu=helpmenu)
 
 root.config(menu=menubar)
