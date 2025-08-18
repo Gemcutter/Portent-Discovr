@@ -1,1 +1,5 @@
-print("Hello World")
+import UI
+def run():
+    UI.createWindow()
+
+run()
