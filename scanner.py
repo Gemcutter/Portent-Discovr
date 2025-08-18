@@ -77,5 +77,4 @@ def basicAssScan():
 
 
 
-print(basicAssScan())
 

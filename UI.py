@@ -28,7 +28,7 @@ def execute():
                     add_log("missing username and/or password")
 
             else:
-                add_log(f"results as follows: {scan_options[selected_scan]()} ")
+                add_log(f"results as follows: \n{scan_options[selected_scan]()} ")
 
 def on_save():
     if log_box.get("1.0", "end-1c"): #if there is logged content
