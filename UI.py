@@ -11,8 +11,9 @@ customtkinter.set_appearance_mode("light")
 
 
 def execute():
-    if listbox.curselection():
-        selected_scan = listbox.get(listbox.curselection()[0])
+    print(combobox.get())
+    if combobox.get():
+        selected_scan = combobox.get()
         if selected_scan: #if there is a scan slelcted
 
             if selected_scan in ["AWS_scan", "Azure_scan"]: #if cloud scan chosen
@@ -97,6 +98,8 @@ root.title("Discovr")
 root.geometry("800x500")
 root.resizable(False, False)
 
+
+#change little icon
 def resource_path(filename):
     if hasattr(sys, "_MEIPASS"):  # Running from PyInstaller bundle
         return os.path.join(sys._MEIPASS, filename)
@@ -127,11 +130,7 @@ content_frame.pack(fill="both", expand=True, padx=5, pady=5)
 left_frame = ttk.Frame(content_frame, width=200)
 left_frame.pack(side="left", fill="y")
 
-ttk.Label(left_frame, text="Scan types").pack(anchor="w")
-listbox = tk.Listbox(left_frame, height=10)
-listbox.pack()#(fill="y", expand=True)
 
-#name to display and function to use. {name: function}, no scanning functions are available yet so all are set to -1 and nothing accesses the dict
 scan_options = {
                 "Scan_1": -1, 
                 "Scan_2": -1, 
@@ -141,8 +140,16 @@ scan_options = {
                 "Azure_scan": -1
                 }
 
-for item in scan_options:
-    listbox.insert("end", item)
+ttk.Label(left_frame, text="Scan type").pack(anchor="w")
+
+
+#name to display and function to use. {name: function}, no scanning functions are available yet so all are set to -1 and nothing accesses the dict
+
+
+
+# TODO change how execute gets its values
+combobox = customtkinter.CTkComboBox(left_frame, values=list(scan_options.keys()), corner_radius=0, border_width=1, border_color="grey")
+combobox.pack()
 
 # Right panel
 right_frame = ttk.Frame(content_frame)
