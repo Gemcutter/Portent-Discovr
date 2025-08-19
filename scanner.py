@@ -41,7 +41,7 @@ def basicAssScan():
     address = address.split(".")
     address = ".".join(address[0:3])
 
-    result = "running - please wait\n"
+
     # build scanner
     nm = nmap.PortScanner()
     # init list
@@ -49,7 +49,7 @@ def basicAssScan():
 
     # scan the network for devices
     nm.scan(hosts=address+".1-254", arguments='-sn -n -PS')
-    result += address+".1-254 scan complete\n"
+    result = address+".1-254 scan complete\n"
     # get hosts from the scan
     hosts_list = [(x, nm[x]['status']['state']) for x in nm.all_hosts()]
     # sort the ip list
