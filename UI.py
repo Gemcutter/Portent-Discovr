@@ -13,7 +13,6 @@ customtkinter.set_appearance_mode("light")
 
 
 def execute():
-    print(combobox.get())
     try:
         if combobox.get():
             selected_scan = combobox.get()
