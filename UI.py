@@ -14,21 +14,24 @@ customtkinter.set_appearance_mode("light")
 
 def execute():
     print(combobox.get())
-    if combobox.get():
-        selected_scan = combobox.get()
-        if selected_scan: #if there is a scan slelcted
+    try:
+        if combobox.get():
+            selected_scan = combobox.get()
+            if selected_scan: #if there is a scan slelcted
 
-            if selected_scan in ["AWS_scan", "Azure_scan"]: #if cloud scan chosen
-                username, password = cloud_provider_login_window()
-                if username == -1:
-                        add_log("cloud login cancelled by user")
-                elif username and password:
-                    add_log(f"username: {username} and password: {password}. !!!this will not be present after this has been properly implimented!!!")
+                if selected_scan in ["AWS_scan", "Azure_scan"]: #if cloud scan chosen
+                    username, password = cloud_provider_login_window()
+                    if username == -1:
+                            add_log("cloud login cancelled by user")
+                    elif username and password:
+                        add_log(f"username: {username} and password: {password}. !!!this will not be present after this has been properly implimented!!!")
+                    else:
+                        add_log("missing username and/or password")
+
                 else:
-                    add_log("missing username and/or password")
-
-            else:
-                add_log(f"results as follows: \n{scan_options[selected_scan]()} ")
+                    add_log(f"results as follows: \n{scan_options[selected_scan]()} ")
+    except Exception as e:
+        add_log(e)
 
 def on_save():
     if log_box.get("1.0", "end-1c"): #if there is logged content
@@ -135,9 +138,9 @@ left_frame.pack(side="left", fill="y")
 #name to display and function to use. {name: function}, no scanning functions are available yet so all are set to -1 and nothing accesses the dict
 scan_options = {
                 "Scan_1": scanner.basicAssScan, 
-                "Scan_2": -1, 
-                "Scan_3": -1, 
-                "Scan_4": -1, 
+                "Scan_2": lambda: -1, 
+                "Scan_3": lambda: -1, 
+                "Scan_4": lambda: -1, 
                 "AWS_scan": -1, 
                 "Azure_scan": -1
                 }
