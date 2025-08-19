@@ -24,9 +24,10 @@ def execute():
         if combobox.get():
             selected_scan = combobox.get()
             if selected_scan: #if there is a scan slelcted
-
                 if selected_scan in ["AWS_scan", "Azure_scan"]: #if cloud scan chosen
+                    
                     username, password = cloud_provider_login_window()
+
                     if username == -1:
                             add_log("cloud login cancelled by user")
                     elif username and password:
@@ -38,6 +39,7 @@ def execute():
                     add_log(f"beginning scan, this might take a few minutes")
                     scan_results = scan_options[selected_scan]()
                     add_log(f"{selected_scan} results as follows: \n{scan_results} ")
+
     except Exception as e:
         add_log(e)
 
