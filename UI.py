@@ -4,16 +4,23 @@ import customtkinter
 from customtkinter import CTkInputDialog, CTkToplevel
 import time
 import sys, os
-
 import scanner
-
-
 
 customtkinter.set_appearance_mode("light")
 
+#name to display and function to use. {name: function}, no scanning functions are available yet so all are set to -1 and nothing accesses the dict
+scan_options = {
+                "Scan_1": scanner.basicAssScan, 
+                "Scan_2": lambda: -1, 
+                "Scan_3": lambda: -1, 
+                "Scan_4": lambda: -1, 
+                "AWS_scan": -1, 
+                "Azure_scan": -1
+                }
+
 
 def execute():
-    try:
+    try: #its error time
         if combobox.get():
             selected_scan = combobox.get()
             if selected_scan: #if there is a scan slelcted
@@ -28,7 +35,9 @@ def execute():
                         add_log("missing username and/or password")
 
                 else:
-                    add_log(f"{selected_scan} results as follows: \n{scan_options[selected_scan]()} ")
+                    add_log(f"beginning scan, this might take a few minutes")
+                    scan_results = scan_options[selected_scan]()
+                    add_log(f"{selected_scan} results as follows: \n{scan_results} ")
     except Exception as e:
         add_log(e)
 
@@ -133,16 +142,6 @@ content_frame.pack(fill="both", expand=True, padx=5, pady=5)
 # Left panel
 left_frame = ttk.Frame(content_frame, width=200)
 left_frame.pack(side="left", fill="y")
-
-#name to display and function to use. {name: function}, no scanning functions are available yet so all are set to -1 and nothing accesses the dict
-scan_options = {
-                "Scan_1": scanner.basicAssScan, 
-                "Scan_2": lambda: -1, 
-                "Scan_3": lambda: -1, 
-                "Scan_4": lambda: -1, 
-                "AWS_scan": -1, 
-                "Azure_scan": -1
-                }
 
 ttk.Label(left_frame, text="Scan type").pack(anchor="w")
 

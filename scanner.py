@@ -43,7 +43,6 @@ def basicAssScan():
     address = ".".join(address[0:3])
 
 
-    results += "running - please wait" + "\n"
     # build scanner
     nm = nmap.PortScanner()
     # init list
