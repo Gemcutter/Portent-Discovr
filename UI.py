@@ -3,27 +3,34 @@ from tkinter import scrolledtext, ttk, messagebox
 import customtkinter
 from customtkinter import CTkInputDialog, CTkToplevel
 import time
+import sys, os
+
+import scanner
+
 
 
 customtkinter.set_appearance_mode("light")
 
 
 def execute():
-    if listbox.curselection():
-        selected_scan = listbox.get(listbox.curselection()[0])
-        if selected_scan: #if there is a scan slelcted
+    try:
+        if combobox.get():
+            selected_scan = combobox.get()
+            if selected_scan: #if there is a scan slelcted
 
-            if selected_scan in ["AWS_scan", "Azure_scan"]: #if cloud scan chosen
-                username, password = cloud_provider_login_window()
-                if username == -1:
-                        add_log("cloud login cancelled by user")
-                elif username and password:
-                    add_log(f"username: {username} and password: {password}. !!!this will not be present after this has been properly implimented!!!")
+                if selected_scan in ["AWS_scan", "Azure_scan"]: #if cloud scan chosen
+                    username, password = cloud_provider_login_window()
+                    if username == -1:
+                            add_log("cloud login cancelled by user")
+                    elif username and password:
+                        add_log(f"username: {username} and password: {password}. !!!this will not be present after this has been properly implimented!!!")
+                    else:
+                        add_log("missing username and/or password")
+
                 else:
-                    add_log("missing username and/or password")
-
-            else:
-                add_log(f"{selected_scan} results as follows: \nlorum ipsum \nqwerty \n1234\n")
+                    add_log(f"results as follows: \n{scan_options[selected_scan]()} ")
+    except Exception as e:
+        add_log(e)
 
 def on_save():
     if log_box.get("1.0", "end-1c"): #if there is logged content
@@ -95,7 +102,14 @@ root.title("Discovr")
 root.geometry("800x500")
 root.resizable(False, False)
 
-iconimage = tk.PhotoImage(file = "Triskele.png")
+
+#change little icon
+def resource_path(filename):
+    if hasattr(sys, "_MEIPASS"):  # Running from PyInstaller bundle
+        return os.path.join(sys._MEIPASS, filename)
+    return filename  # Running normally
+
+iconimage = tk.PhotoImage(file=resource_path("Triskele.png"))
 root.iconphoto(True, iconimage)
 
 # Menu bar
@@ -107,7 +121,7 @@ filemenu.add_command(label="Exit", command=on_exit)
 menubar.add_cascade(label="File", menu=filemenu)
 
 helpmenu = tk.Menu(menubar, tearoff=0)
-helpmenu.add_command(label="About", command=lambda: messagebox.showinfo(" ", "You wish")) #empty title due to size restraints
+helpmenu.add_command(label="About", command=lambda: messagebox.showinfo(" ", "You wish")) #empty messagebox title due to size restraints
 menubar.add_cascade(label="Help", menu=helpmenu)
 
 root.config(menu=menubar)
@@ -120,22 +134,20 @@ content_frame.pack(fill="both", expand=True, padx=5, pady=5)
 left_frame = ttk.Frame(content_frame, width=200)
 left_frame.pack(side="left", fill="y")
 
-ttk.Label(left_frame, text="Scan types").pack(anchor="w")
-listbox = tk.Listbox(left_frame, height=10)
-listbox.pack()#(fill="y", expand=True)
-
 #name to display and function to use. {name: function}, no scanning functions are available yet so all are set to -1 and nothing accesses the dict
 scan_options = {
-                "Scan_1": -1, 
-                "Scan_2": -1, 
-                "Scan_3": -1, 
-                "Scan_4": -1, 
+                "Scan_1": scanner.basicAssScan, 
+                "Scan_2": lambda: -1, 
+                "Scan_3": lambda: -1, 
+                "Scan_4": lambda: -1, 
                 "AWS_scan": -1, 
                 "Azure_scan": -1
                 }
 
-for item in scan_options:
-    listbox.insert("end", item)
+ttk.Label(left_frame, text="Scan type").pack(anchor="w")
+
+combobox = customtkinter.CTkComboBox(left_frame, values=list(scan_options.keys()), corner_radius=0, border_width=1, border_color="grey")
+combobox.pack()
 
 # Right panel
 right_frame = ttk.Frame(content_frame)
@@ -169,4 +181,6 @@ log_box.grid(row=2, column=0, columnspan=3)
 right_frame.columnconfigure(1, weight=1)
 
 
-# root.mainloop()
+
+if __name__ == "__main__":
+    root.mainloop()

@@ -33,6 +33,7 @@ def mergeSortHostByValue(li):
     return tmp
 
 def basicAssScan():
+    results = ""
     # get local ipv4
     hostname = socket.gethostname()
     address = socket.gethostbyname(hostname)
@@ -42,7 +43,7 @@ def basicAssScan():
     address = ".".join(address[0:3])
 
 
-    print("running - please wait")
+    results += "running - please wait" + "\n"
     # build scanner
     nm = nmap.PortScanner()
     # init list
@@ -50,7 +51,7 @@ def basicAssScan():
 
     # scan the network for devices
     nm.scan(hosts=address+".1-254", arguments='-sn -n -PS')
-    print(address+".1-254 scan complete")
+    results += address+".1-254 scan complete" + "\n"
     # get hosts from the scan
     hosts_list = [(x, nm[x]['status']['state']) for x in nm.all_hosts()]
     # sort the ip list
@@ -58,7 +59,7 @@ def basicAssScan():
 
     # print the ips and their status
     for host, status in hosts_list:
-        print(host+': '+status)
+        results += host+': '+status + "\n"
         # add ips to secondary scan list
         myHostList.append(host)
 
@@ -67,12 +68,12 @@ def basicAssScan():
 
     # print the obtained information
     for ip in OSguess["scan"]:
-        print("ip: "+ip)
+        results += "ip: "+ip + "\n"
         for obj in OSguess["scan"][ip]["osmatch"]:
-            print("device: "+obj['name']+", accuracy: "+obj['accuracy'])
+            results += "device: "+obj['name']+", accuracy: "+obj['accuracy'] + "\n"
     # done!
-    print("Complete")
-
+    results += "Complete" + "\n"
+    return results
 
 
 
