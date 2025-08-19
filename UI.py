@@ -28,7 +28,7 @@ def execute():
                         add_log("missing username and/or password")
 
                 else:
-                    add_log(f"results as follows: \n{scan_options[selected_scan]()} ")
+                    add_log(f"{selected_scan} results as follows: \n{scan_options[selected_scan]()} ")
     except Exception as e:
         add_log(e)
 
