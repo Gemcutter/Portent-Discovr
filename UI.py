@@ -42,8 +42,7 @@ def execute():
 
                 else:
                     add_log(f"beginning scan, this might take up to a few minutes")
-                    scan_results = scan_options[selected_scan]()
-                    add_log(f"{selected_scan} results as follows: \n{scan_results} ")
+                    add_log(f"{selected_scan} results as follows: \n{scan_options[selected_scan]()} ")
 
     except Exception as e:
         add_log(e)
