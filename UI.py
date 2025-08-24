@@ -11,7 +11,7 @@ customtkinter.set_appearance_mode("light")
 
 #name to display and function to use. {name: function}, no scanning functions are available yet so all are set to -1 and nothing accesses the dict
 scan_options = {
-                "Scan_1": scanner.basicAssScan, 
+                "Scan_1": scanner.basicScan, 
                 "Scan_2": lambda: -1, 
                 "Scan_3": lambda: -1, 
                 "Scan_4": lambda: -1, 
