@@ -1,13 +1,7 @@
 import boto3
 
-'''
-ACCESS_KEY = 'AKIAQDKVY2FF2DVI4SE2'
-SECRET_KEY = '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'
-    aws_access_key_id= ACCESS_KEY,
-    aws_secret_access_key= SECRET_KEY,
-    region_name= 'ap-southeast-2'
-'''
-def aws_ec2_scan(): #must have aws cli configured
+
+def aws_ec2_scan(): #must have aws cli configured, add option to manually input access and secret keys
     client = boto3.client('ec2')
 
     results = client.describe_instances()
