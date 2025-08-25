@@ -42,7 +42,8 @@ def execute():
 
                 else:
                     add_log(f"beginning scan, this might take up to a few minutes")
-                    add_log(f"{selected_scan} results as follows: \n{scan_options[selected_scan]()} ")
+                    scan_options[selected_scan](add_log)
+                    #add_log(f"{selected_scan} results as follows: \n{scan_options[selected_scan]()} ")
 
     except Exception as e:
         add_log(e)
@@ -61,6 +62,7 @@ def add_log(message):
     log_box.insert(tk.END, f"{time_now()} - {message}\n") #adds timestamp to line
     log_box.see(tk.END)  # Auto-scroll to bottom
     log_box.configure(state="disabled") #disable again
+    root.update_idletasks()
 
 def time_now():
     t = time.localtime()
