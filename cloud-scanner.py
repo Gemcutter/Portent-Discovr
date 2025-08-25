@@ -1,14 +1,25 @@
 import boto3
 
-boto3
+'''
+ACCESS_KEY = 'AKIAQDKVY2FF2DVI4SE2'
+SECRET_KEY = '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'
+    aws_access_key_id= ACCESS_KEY,
+    aws_secret_access_key= SECRET_KEY,
+    region_name= 'ap-southeast-2'
+'''
+def aws_ec2_scan(): #must have aws cli configured
+    client = boto3.client('ec2')
 
-ACCESS_KEY = -1
-SECRET_KEY = -1
-SESSION_TOKEN = -1
+    results = client.describe_instances()
+    inst = results['Reservations'][0]['Instances'][0]
 
-client = boto3.client(
-    's3',
-    aws_access_key_id=ACCESS_KEY,
-    aws_secret_access_key=SECRET_KEY,
-    aws_session_token=SESSION_TOKEN
-)
+
+    print(inst['InstanceType'])
+    print(inst['PlatformDetails'])
+    print(inst['State']['Name'])
+
+
+    print('Private: ' + inst['PrivateIpAddress'])
+    #print('Public: ' + inst['PublicIpAddress'])
+
+aws_ec2_scan()
