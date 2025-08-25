@@ -32,8 +32,7 @@ def mergeSortHostByValue(li):
             tmp.append(last.pop(0))
     return tmp
 
-def basicAssScan():
-    results = ""
+def basicScan():
     # get local ipv4
     hostname = socket.gethostname()
     address = socket.gethostbyname(hostname)
@@ -43,7 +42,6 @@ def basicAssScan():
     address = ".".join(address[0:3])
 
 
-    results += "running - please wait" + "\n"
     # build scanner
     nm = nmap.PortScanner()
     # init list
@@ -51,7 +49,7 @@ def basicAssScan():
 
     # scan the network for devices
     nm.scan(hosts=address+".1-254", arguments='-sn -n -PS')
-    results += address+".1-254 scan complete" + "\n"
+    result = address+".1-254 scan complete\n"
     # get hosts from the scan
     hosts_list = [(x, nm[x]['status']['state']) for x in nm.all_hosts()]
     # sort the ip list
@@ -59,21 +57,21 @@ def basicAssScan():
 
     # print the ips and their status
     for host, status in hosts_list:
-        results += host+': '+status + "\n"
+        result += host+': '+status+"\n"
         # add ips to secondary scan list
         myHostList.append(host)
 
     # run a secondary scan to determine operating systems of located devices
-    OSguess = nm.scan(hosts=" ".join(myHostList), arguments='-O -p21-25,80,139,8080')
+    OSguess = nm.scan(hosts=" ".join(myHostList), arguments='-O -p20-25,53,80,110,119,123,143,161,194,443 --osscan-guess') # -p21-25,80,139,443
 
     # print the obtained information
     for ip in OSguess["scan"]:
-        results += "ip: "+ip + "\n"
+        result += "ip: "+ip+"\n"
         for obj in OSguess["scan"][ip]["osmatch"]:
-            results += "device: "+obj['name']+", accuracy: "+obj['accuracy'] + "\n"
+            result += "device: "+obj['name']+", accuracy: "+obj['accuracy']+"\n"
     # done!
-    results += "Complete" + "\n"
-    return results
+    result += "Complete\n"
+    return result
 
 
 
