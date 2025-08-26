@@ -1,8 +1,20 @@
 # needs a 'pip install scapy'
 from scapy.all import ARP, Ether, srp
+import socket
 
-# ip address to scan
-target_ip = "10.136.249.0/24"  
+# manual ip address to scan
+#target_ip = "10.136.249.0/24"  
+
+# yoinking missy's host ip grabber from scanner.py
+# get local ipv4
+hostname = socket.gethostname()
+address = socket.gethostbyname(hostname)
+
+# break down the ip to get the first 3 quarters only
+address = address.split(".")
+address = ".".join(address[0:3])
+
+target_ip = address + ".0/24"
 
 # build packet for both ip and MAC address (it can do both which could be an additional bit of info to have to make us look better)
 arp = ARP(pdst=target_ip)
