@@ -4,17 +4,19 @@ import customtkinter
 from customtkinter import CTkInputDialog, CTkToplevel, CTkButton, CTkEntry, CTkLabel, CTkComboBox
 import time
 import sys, os
+
 import scanner
+import ArpScanner
 
 
 customtkinter.set_appearance_mode("light")
 
 #name to display and function to use. {name: function}, no scanning functions are available yet so all are set to -1 and nothing accesses the dict
 scan_options = {
-                "Scan_1": scanner.basicScan, 
-                "Scan_2": lambda: -1, 
-                "Scan_3": lambda: -1, 
-                "Scan_4": lambda: -1, 
+                "Basic Scan": scanner.basicScan, 
+                "Arp Scan": ArpScanner.arpscan, 
+                "Scan_3": lambda _: -1, 
+                "Scan_4": lambda _: -1, 
                 "AWS_scan": -1, 
                 "Azure_scan": -1
                 }
@@ -42,7 +44,7 @@ def execute():
 
                 else:
                     add_log(f"beginning scan, this might take up to a few minutes")
-                    scan_options[selected_scan](add_log)
+                    scan_options[selected_scan](add_log, entry.get())
                     #add_log(f"{selected_scan} results as follows: \n{scan_options[selected_scan]()} ")
 
     except Exception as e:
@@ -148,21 +150,23 @@ left_frame.pack(side="left", fill="y")
 
 CTkLabel(left_frame, text="Scan type").pack(anchor="w")
 
-combobox = CTkComboBox(left_frame, values=list(scan_options.keys()), corner_radius=0, border_width=1, border_color="grey")
+combobox = CTkComboBox(left_frame, values=list(scan_options.keys()), state='readonly', corner_radius=0, border_width=1, border_color="grey")
+combobox.set(list(scan_options.keys())[0])
 combobox.pack()
+
 
 # Right panel
 right_frame = ttk.Frame(content_frame)
 right_frame.pack(side="right", fill="both", expand=True, padx=10)
 
 CTkLabel(right_frame, text="Scan options:").grid(row=0, column=0, sticky="w")
-entry = CTkEntry(right_frame, placeholder_text="not currently implimented :(", corner_radius=0, border_width=1, border_color="grey")#ttk.Entry(right_frame)
+entry = CTkEntry(right_frame, placeholder_text="for selecting arp scan ip target", corner_radius=0, border_width=1, border_color="grey")#ttk.Entry(right_frame)
 entry.grid(row=0, column=1, pady=5, sticky="ew")
 
 save_btn = CTkButton(right_frame, text="Save log to file", command= on_save)
 save_btn.grid(row=1, column=0, pady=10, sticky="w")
 
-eval_btn = CTkButton(right_frame, text="Scan", command= execute) #horrifically insecure, but looks cool, will fix later
+eval_btn = CTkButton(right_frame, text="Scan", command= execute) #no longer insecure :)
 eval_btn.grid(row=1, column=1, pady=10, sticky="n")
 
 exit_btn = CTkButton(right_frame, text="Exit", command= on_exit)

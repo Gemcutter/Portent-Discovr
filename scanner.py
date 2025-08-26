@@ -34,7 +34,7 @@ def mergeSortHostByValue(li):
             tmp.append(last.pop(0))
     return tmp
 
-def basicScan(add_log):
+def basicScan(add_log, args):
     # get local ipv4
     hostname = socket.gethostname()
     address = socket.gethostbyname(hostname)
