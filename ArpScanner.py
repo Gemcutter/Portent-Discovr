@@ -1,4 +1,4 @@
-# needs a 'pip intall scapy'
+# needs a 'pip install scapy'
 from scapy.all import ARP, Ether, srp
 
 # ip address to scan
