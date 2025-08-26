@@ -51,7 +51,7 @@ def basicScan(add_log):
     myHostList=[]
 
     # scan the network for devices
-    nm.scan(hosts=address+".1-254", arguments='-sn -n -PS --host-timeout 10ms')
+    nm.scan(hosts=address+".1-254", arguments='-sn -n -PS --host-timeout 1000ms')
     add_log(address+".1-254 scan complete")
     # get hosts from the scan
     hosts_list = [(x, nm[x]['status']['state']) for x in nm.all_hosts()]
@@ -65,8 +65,8 @@ def basicScan(add_log):
         myHostList.append(host)
 
     # run a secondary scan to determine operating systems of located devices
-    OSguess = nm.scan(hosts=" ".join(myHostList), arguments='-O -p21-25,80,139,443') # -p21-25,80,139,443
-
+    OSguess = nm.scan(hosts=" ".join(myHostList), arguments='-O --host-timeout 7000ms -f') # -p21-25,80,139,443
+    add_log(OSguess)
     # print the obtained information
     for ip in OSguess["scan"]:
         add_log("ip: "+ip)
