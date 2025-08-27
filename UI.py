@@ -7,6 +7,7 @@ import sys, os
 
 import scanner
 import ArpScanner
+import cloudScanner
 
 
 customtkinter.set_appearance_mode("light")
@@ -17,7 +18,7 @@ scan_options = {
                 "Arp Scan": ArpScanner.arpscan, 
                 "Scan_3": lambda _: -1, 
                 "Scan_4": lambda _: -1, 
-                "AWS_scan": -1, 
+                "AWS_scan": cloudScanner.aws_ec2_scan, 
                 "Azure_scan": -1
                 }
 
@@ -31,7 +32,7 @@ def execute():
         if combobox.get():
             selected_scan = combobox.get()
             if selected_scan: #if there is a scan slelcted
-                if selected_scan in ["AWS_scan", "Azure_scan"]: #if cloud scan chosen
+                if selected_scan in ["Azure_scan"]: #if cloud scan chosen
 
                     username, password = cloud_provider_login_window()
 
