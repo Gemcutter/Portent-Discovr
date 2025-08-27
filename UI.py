@@ -179,7 +179,7 @@ log_box = scrolledtext.ScrolledText( #its the wacky fake terminal log thingymaji
     font=("Courier New", 10),
     bg="black",
     fg="lime",
-    state="disabled"  # Start read-only
+    state="disabled"  # start read-only
 )
 log_box.grid(row=2, column=0, columnspan=3)
 
