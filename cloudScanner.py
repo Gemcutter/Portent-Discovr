@@ -7,7 +7,7 @@ def nice_disp(inst, var):
 def aws_ec2_scan(add_log, args): #must have aws cli configured, add option to manually input access and secret keys
     client = boto3.client('ec2')
 
-    results = client.describe_instances() # chang
+    results = client.describe_instances()
 
 
     for reservation in results['Reservations']:
