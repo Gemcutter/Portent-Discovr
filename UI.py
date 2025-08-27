@@ -96,13 +96,13 @@ def cloud_provider_login_window(): #my own worse CTkInputDialogue with 2 spaces 
     window.resizable(False,False)
     window.attributes("-topmost", True)
 
-    label = CTkLabel(window, text="Enter login details")
+    label = CTkLabel(window, text="Enter cloud credentials. This is not saved")
     label.grid(row=0, column=0, columnspan=2, padx=20, pady=20, sticky="ew")
 
-    eusr = CTkEntry(window,placeholder_text="Username:")
+    eusr = CTkEntry(window,placeholder_text="Access Key:")
     eusr.grid(row=1, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
 
-    epswd = CTkEntry(window,placeholder_text="Password:")
+    epswd = CTkEntry(window,placeholder_text="Secret Key:")
     epswd.grid(row=2, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
 
     ok = CTkButton(window, text="Ok", command= ok)
@@ -110,6 +110,9 @@ def cloud_provider_login_window(): #my own worse CTkInputDialogue with 2 spaces 
 
     cancel = CTkButton(window, text="Cancel", command= cancel)
     cancel.grid(row=5,column=1, padx=(10, 20), pady=(0, 20))
+
+    env = CTkButton(window, text="Use enviroment variables", command= None)
+    env.grid(row=6,column=0, padx=(10, 20), pady=(0, 20), columnspan=2) #add colspan
 
     window.wait_window()
     
