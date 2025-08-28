@@ -16,10 +16,8 @@ customtkinter.set_appearance_mode("light")
 scan_options = {
                 "Basic Scan": scanner.basicScan, 
                 "Arp Scan": ArpScanner.arpscan, 
-                "Scan_3": lambda _: -1, 
-                "Scan_4": lambda _: -1, 
                 "AWS_scan": cloudScanner.aws_ec2_scan, 
-                "Azure_scan": -1
+                "Azure_scan": lambda x, _ : add_log("not implimented")
                 }
 
 def resource_path(filename): #to get iconimage working
@@ -32,16 +30,14 @@ def execute():
         if combobox.get():
             selected_scan = combobox.get()
             if selected_scan: #if there is a scan slelcted
-                if selected_scan in ["Azure_scan"]: #if cloud scan chosen
-
-                    username, password = cloud_provider_login_window()
+                if selected_scan in ["AWS_scan","Azure_scan"]: #if aws scan chosen
+                    username, password = cloud_provider_login_window() # access and secret key
 
                     if username == -1:
-                            add_log("cloud login cancelled by user")
-                    elif username and password:
-                        add_log(f"username: {username} and password: {password}. !!!this will not be present after this has been properly implimented!!!")
-                    else:
-                        add_log("missing username and/or password")
+                        add_log("cloud login cancelled by user")
+
+                    else: 
+                        scan_options[selected_scan](add_log,(username, password))
 
                 else:
                     add_log(f"beginning scan, this might take up to a few minutes")
@@ -91,6 +87,11 @@ def cloud_provider_login_window(): #my own worse CTkInputDialogue with 2 spaces 
         result["pass"] = -1
         window.destroy()
 
+    def use_env():
+        result["user"] = 0
+        result["pass"] = 0
+        window.destroy()
+
     window = CTkToplevel(root)
     window.title("Cloud login")
     window.resizable(False,False)
@@ -111,7 +112,7 @@ def cloud_provider_login_window(): #my own worse CTkInputDialogue with 2 spaces 
     cancel = CTkButton(window, text="Cancel", command= cancel)
     cancel.grid(row=5,column=1, padx=(10, 20), pady=(0, 20))
 
-    env = CTkButton(window, text="Use enviroment variables", command= None)
+    env = CTkButton(window, text="Use enviroment variables", command= use_env)
     env.grid(row=6,column=0, padx=(10, 20), pady=(0, 20), columnspan=2) #add colspan
 
     window.wait_window()

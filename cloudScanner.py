@@ -5,7 +5,16 @@ def nice_disp(inst, var):
     return f'{var}: {inst[var]}'
 
 def aws_ec2_scan(add_log, args): #must have aws cli configured, add option to manually input access and secret keys
-    client = boto3.client('ec2')
+    if args[0] == 0 and args[1] == 0: # use env variables
+        client = boto3.client('ec2')
+
+    else: # use entered variables
+        client = boto3.client('ec2',
+                              aws_access_key_id=args[0],
+                              aws_secret_access_key=args[1],)
+                              #region_name=region)
+
+    
 
     results = client.describe_instances()
 
