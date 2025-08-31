@@ -17,7 +17,7 @@ scan_options = {
                 "Basic Scan": scanner.basicScan, 
                 "Arp Scan": ArpScanner.arpscan, 
                 "AWS_scan": cloudScanner.aws_ec2_scan, 
-                "Azure_scan": lambda x, _ : add_log("not implimented")
+                "Azure_scan": cloudScanner.azure_vm_scan #doesnt work with manually entered credentials?
                 }
 
 def resource_path(filename): #to get iconimage working
@@ -30,14 +30,17 @@ def execute():
         if combobox.get():
             selected_scan = combobox.get()
             if selected_scan: #if there is a scan slelcted
-                if selected_scan in ["AWS_scan","Azure_scan"]: #if aws scan chosen
-                    username, password = cloud_provider_login_window() # access and secret key
+                if selected_scan in ["AWS_scan", "Azure_scan"]: #if aws scan chosen
+                    if selected_scan == "AWS_scan":
+                        results = cloud_login_window("AWS")
+                    elif selected_scan == "Azure_scan":
+                        results = cloud_login_window("Azure")
 
-                    if username == -1:
+
+                    if results["cancelled"] == 1:
                         add_log("cloud login cancelled by user")
-
-                    else: 
-                        scan_options[selected_scan](add_log,(username, password))
+                    else:
+                        scan_options[selected_scan](results)
 
                 else:
                     add_log(f"beginning scan, this might take up to a few minutes")
@@ -74,51 +77,86 @@ def file_name_query():
     dialog = CTkInputDialog(text="Enter name of file to be saved", title="Save file") #possibly should add a check to see if file exists and warning if overwriting
     return dialog.get_input()
 
-def cloud_provider_login_window(): #my own worse CTkInputDialogue with 2 spaces for input
-    result = {"user": None, "pass": None}
+def cloud_login_window(mode): #my own worse CTkInputDialogue with 2 spaces for input
+    result = {"access_key": None, 
+              "secret_key": None, 
+              "subscription_id": None,
+              "tenant_id": None, 
+              "client_id": None, 
+              "secret_value": None,
+              "cancelled": 0,
+              "use_env": 0}
 
     def ok():
-        result["user"] = eusr.get()
-        result["pass"] = epswd.get()
+        if mode == "AWS":
+            result["access_key"] = access_key_entry.get()
+            result["secret_key"] = secret_key_entry.get()
+
+        if mode == "Azure":
+            result["subscription_id"] = subscription_id_entry.get()
+            result["tenant_id"] = tenant_id_entry.get()
+            result["client_id"] = client_id_entry.get()
+            result["secret_value"] = secret_client_id_entry.get()
+        
         window.destroy()
 
     def cancel():
-        result["user"] = -1
-        result["pass"] = -1
+        result["cancelled"] = 1
         window.destroy()
 
     def use_env():
-        result["user"] = 0
-        result["pass"] = 0
+        if mode == "Azure":
+            result["subscription_id"] = subscription_id_entry.get()
+        result["use_env"] = 1
         window.destroy()
 
     window = CTkToplevel(root)
-    window.title("Cloud login")
+    window.title(f"{mode} login")
     window.resizable(False,False)
     window.attributes("-topmost", True)
 
     label = CTkLabel(window, text="Enter cloud credentials. This is not saved")
+    if mode == "Azure":
+        label = CTkLabel(window, text="Enter cloud credentials. This is not saved. If possible use env variables. it might work normally if you know azure better than me but i couldnt get it to work")
     label.grid(row=0, column=0, columnspan=2, padx=20, pady=20, sticky="ew")
+        
+    
 
-    eusr = CTkEntry(window,placeholder_text="Access Key:")
-    eusr.grid(row=1, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
+    if mode == "AWS":
+        access_key_entry = CTkEntry(window,placeholder_text="Access Key:")
+        secret_key_entry = CTkEntry(window,placeholder_text="Secret Key:")
+        access_key_entry.grid(row=1, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
+        secret_key_entry.grid(row=2, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
+    
 
-    epswd = CTkEntry(window,placeholder_text="Secret Key:")
-    epswd.grid(row=2, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
+    if mode == "Azure":
+        tenant_id_entry = CTkEntry(window,placeholder_text="Tenant ID:")
+        tenant_id_entry.grid(row=1, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
+
+        subscription_id_entry = CTkEntry(window,placeholder_text="Subscription ID: (needed if using env vars)")
+        subscription_id_entry.grid(row=2, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
+
+        client_id_entry = CTkEntry(window,placeholder_text="Client ID:")
+        client_id_entry.grid(row=3, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
+
+        secret_client_id_entry = CTkEntry(window,placeholder_text="Secret Value:")
+        secret_client_id_entry.grid(row=4, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
+
 
     ok = CTkButton(window, text="Ok", command= ok)
-    ok.grid(row=5,column=0, padx=(20, 10), pady=(0, 20))
+    ok.grid(row=7,column=0, padx=(20, 10), pady=(0, 20))
 
     cancel = CTkButton(window, text="Cancel", command= cancel)
-    cancel.grid(row=5,column=1, padx=(10, 20), pady=(0, 20))
+    cancel.grid(row=7,column=1, padx=(10, 20), pady=(0, 20))
 
     env = CTkButton(window, text="Use enviroment variables", command= use_env)
-    env.grid(row=6,column=0, padx=(10, 20), pady=(0, 20), columnspan=2) #add colspan
+    env.grid(row=8,column=0, padx=(10, 20), pady=(0, 20), columnspan=2) #add colspan
 
     window.wait_window()
     
-    return result["user"], result["pass"]
+    return result
 
+cloudScanner.add_log = add_log # set cloudscanner class output function
 
 # Main window
 root = tk.Tk()
