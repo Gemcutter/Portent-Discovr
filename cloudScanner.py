@@ -1,4 +1,9 @@
+#for AWS
 import boto3
+
+#for Azure
+from azure.identity import DefaultAzureCredential
+from azure.mgmt.compute import ComputeManagementClient
 
 
 def nice_disp(inst, var):
@@ -51,3 +56,19 @@ def aws_ec2_scan(add_log, args): #must have aws cli configured, add option to ma
 
         add_log("-------------------------------")
         add_log("")
+
+
+def azure_vm_scan(add_log, args):
+    pass
+
+if __name__ == "__main__":
+    print("A")
+    subscription_id = "97dbcd1f-1d36-4993-9596-e073bf1d2221"
+
+    # Authenticate
+    credential = DefaultAzureCredential()
+    compute_client = ComputeManagementClient(credential, subscription_id)
+
+    # List all VMs in the subscription
+    for vm in compute_client.virtual_machines.list_all():
+        print(f"Name: {vm.name}, Location: {vm.location}, Resource Group: {vm.id.split('/')[4]}")
