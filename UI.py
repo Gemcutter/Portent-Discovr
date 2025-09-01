@@ -80,10 +80,8 @@ def file_name_query():
 def cloud_login_window(mode): #my own worse CTkInputDialogue with 2 spaces for input
     result = {"access_key": None, 
               "secret_key": None, 
+              "location": None,
               "subscription_id": None,
-              "tenant_id": None, 
-              "client_id": None, 
-              "secret_value": None,
               "cancelled": 0,
               "use_env": 0}
 
@@ -91,12 +89,12 @@ def cloud_login_window(mode): #my own worse CTkInputDialogue with 2 spaces for i
         if mode == "AWS":
             result["access_key"] = access_key_entry.get()
             result["secret_key"] = secret_key_entry.get()
+            result["location"] = None#location_menu.get()
 
         if mode == "Azure":
             result["subscription_id"] = subscription_id_entry.get()
-            result["tenant_id"] = tenant_id_entry.get()
-            result["client_id"] = client_id_entry.get()
-            result["secret_value"] = secret_client_id_entry.get()
+            
+
         
         window.destroy()
 
@@ -117,7 +115,7 @@ def cloud_login_window(mode): #my own worse CTkInputDialogue with 2 spaces for i
 
     label = CTkLabel(window, text="Enter cloud credentials. This is not saved")
     if mode == "Azure":
-        label = CTkLabel(window, text="Enter cloud credentials. This is not saved. \nIf possible use env variables. it might work normally if you \nknow azure better than me but i couldnt get it to work")
+        label = CTkLabel(window, text="Must be logged in with azure cli")
     label.grid(row=0, column=0, columnspan=2, padx=20, pady=20, sticky="ew")
         
     
@@ -127,21 +125,13 @@ def cloud_login_window(mode): #my own worse CTkInputDialogue with 2 spaces for i
         secret_key_entry = CTkEntry(window,placeholder_text="Secret Key:")
         access_key_entry.grid(row=1, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
         secret_key_entry.grid(row=2, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
-    
+
+        #try to make a scrollable/searchable menu for all aws regions in cloudScanner.locations
 
     if mode == "Azure":
-        subscription_id_entry = CTkEntry(window,placeholder_text="Subscription ID: (needed if using env vars)")
+        subscription_id_entry = CTkEntry(window,placeholder_text="Subscription ID:")
         subscription_id_entry.grid(row=1, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
-    
-        tenant_id_entry = CTkEntry(window,placeholder_text="Tenant ID:")
-        tenant_id_entry.grid(row=2, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
 
-
-        client_id_entry = CTkEntry(window,placeholder_text="Client ID:")
-        client_id_entry.grid(row=3, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
-
-        secret_client_id_entry = CTkEntry(window,placeholder_text="Secret Value:")
-        secret_client_id_entry.grid(row=4, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
 
 
     ok = CTkButton(window, text="Ok", command= ok)
@@ -150,8 +140,9 @@ def cloud_login_window(mode): #my own worse CTkInputDialogue with 2 spaces for i
     cancel = CTkButton(window, text="Cancel", command= cancel)
     cancel.grid(row=7,column=1, padx=(10, 20), pady=(0, 20))
 
-    env = CTkButton(window, text="Use enviroment variables", command= use_env)
-    env.grid(row=8,column=0, padx=(10, 20), pady=(0, 20), columnspan=2) #add colspan
+    if mode == "AWS":
+        env = CTkButton(window, text="Use enviroment variables", command= use_env)
+        env.grid(row=8,column=0, padx=(10, 20), pady=(0, 20), columnspan=2) #add colspan
 
     window.wait_window()
     

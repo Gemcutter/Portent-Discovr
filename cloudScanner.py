@@ -7,6 +7,41 @@ from azure.mgmt.compute import ComputeManagementClient
 
 
 add_log = None
+aws_region_codes = [
+    "us-east-1",      # US East (N. Virginia)
+    "us-east-2",      # US East (Ohio)
+    "us-west-1",      # US West (N. California)
+    "us-west-2",      # US West (Oregon)
+    "af-south-1",     # Africa (Cape Town)
+    "ap-east-1",      # Asia Pacific (Hong Kong)
+    "ap-east-2",      # Asia Pacific (Taipei)
+    "ap-northeast-1", # Asia Pacific (Tokyo)
+    "ap-northeast-2", # Asia Pacific (Seoul)
+    "ap-northeast-3", # Asia Pacific (Osaka)
+    "ap-southeast-1", # Asia Pacific (Singapore)
+    "ap-southeast-2", # Asia Pacific (Sydney)
+    "ap-southeast-3", # Asia Pacific (Jakarta)
+    "ap-southeast-4", # Asia Pacific (Melbourne)
+    "ap-southeast-5", # Asia Pacific (Malaysia)
+    "ap-southeast-7", # Asia Pacific (Thailand)
+    "ap-south-1",     # Asia Pacific (Mumbai)
+    "ap-south-2",     # Asia Pacific (Hyderabad)
+    "ca-central-1",   # Canada (Central)
+    "ca-west-1",      # Canada West (Calgary)
+    "eu-central-1",   # Europe (Frankfurt)
+    "eu-central-2",   # Europe (Zurich)
+    "eu-west-1",      # Europe (Ireland)
+    "eu-west-2",      # Europe (London)
+    "eu-west-3",      # Europe (Paris)
+    "eu-north-1",     # Europe (Stockholm)
+    "eu-south-1",     # Europe (Milan)
+    "eu-south-2",     # Europe (Spain)
+    "il-central-1",   # Israel (Tel Aviv)
+    "me-south-1",     # Middle East (Bahrain)
+    "me-central-1",   # Middle East (UAE)
+    "mx-central-1",   # Mexico (Central)
+    "sa-east-1"       # South America (São Paulo)
+]
 
 
 def nice_disp(inst, var):
@@ -19,8 +54,8 @@ def aws_ec2_scan(args): #must have aws cli configured, add option to manually in
     else: # use entered variables
         client = boto3.client('ec2',
                               aws_access_key_id=args["access_key"],
-                              aws_secret_access_key=args["secret_key"],)
-                              #region_name=region)
+                              aws_secret_access_key=args["secret_key"],
+                              region_name=args["location"])
 
     
 
@@ -62,22 +97,15 @@ def aws_ec2_scan(args): #must have aws cli configured, add option to manually in
 
 
 def azure_vm_scan(args):
-    if args["use_env"] == 1: # use env variables
-        subscription_id = args["subscription_id"]#"97dbcd1f-1d36-4993-9596-e073bf1d2221"
+    subscription_id = args["subscription_id"]
 
-        credential = DefaultAzureCredential()
-        compute_client = ComputeManagementClient(credential, subscription_id)
+    credential = DefaultAzureCredential()
+    compute_client = ComputeManagementClient(credential, subscription_id)
 
-    else: 
-        tenant_id = args["tenant_id"]
-        client_id = args["client_id"]
-        client_secret = args["secret_value"]
-        subscription_id = args["subscription_id"]
 
-        credential = ClientSecretCredential(tenant_id, client_id, client_secret)
-        compute_client = ComputeManagementClient(credential, subscription_id)
 
     # List all VMs in the subscription
+    add_log("===============================")
     for vm in compute_client.virtual_machines.list_all():
         add_log(f"Name: {vm.name}")
         add_log(f"VM Type: {vm.hardware_profile.vm_size}")
