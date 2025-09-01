@@ -117,7 +117,7 @@ def cloud_login_window(mode): #my own worse CTkInputDialogue with 2 spaces for i
 
     label = CTkLabel(window, text="Enter cloud credentials. This is not saved")
     if mode == "Azure":
-        label = CTkLabel(window, text="Enter cloud credentials. This is not saved. If possible use env variables. it might work normally if you know azure better than me but i couldnt get it to work")
+        label = CTkLabel(window, text="Enter cloud credentials. This is not saved. \nIf possible use env variables. it might work normally if you \nknow azure better than me but i couldnt get it to work")
     label.grid(row=0, column=0, columnspan=2, padx=20, pady=20, sticky="ew")
         
     
