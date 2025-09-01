@@ -85,20 +85,17 @@ def threadedScan(add_log):
     x = get_default_interface()
     netmask = x.with_netmask.split('/')[1]
     netmaskBinary = decimalToBinary(netmask.split("."))
-    
-    wipeKey = 0
+    ipBinary = decimalToBinary(address.split("."))
+
+    ipBaseBinary = ""
     for i in range(len(netmaskBinary)):
         if int(netmaskBinary[i]) == 1:
-            wipeKey = i+1
-    padding0 = ""
-    padding1 = ""
-    for i in range(32-wipeKey):
-        padding0+="0"
-        padding1+="1"
-    minSearch = decimalToBinary(address.split("."))[:wipeKey]+padding0
-    maxSearch = decimalToBinary(address.split("."))[:wipeKey]+padding1
-    minSearch = binaryToDecimal(minSearch)
-    maxSearch = binaryToDecimal(maxSearch)
+            ipBaseBinary+=ipBinary[i]
+        else:
+            ipBaseBinary+="X"
+
+    minSearch = binaryToDecimal(ipBaseBinary.replace("X","0"))
+    maxSearch = binaryToDecimal(ipBaseBinary.replace("X","1"))
 
 
     address = address.split(".")
@@ -107,6 +104,7 @@ def threadedScan(add_log):
     scanRanges = getScanRanges(minSearch, maxSearch)
 
     add_log("running - please wait")
+    add_log(f"Scan range is from {minSearch} to {maxSearch}")
     nm = nmap.PortScanner()
     myHostList=[]
     for scanRange in scanRanges:
