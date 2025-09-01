@@ -119,12 +119,17 @@ class MyThread(threading.Thread):
         self.nm = nm
 
     def run(self):
-        OSguess = self.nm.scan(hosts=self.address, arguments='-O --host-timeout 7000ms')
+        OSguess = self.nm.scan(hosts=self.address, arguments='-O --host-timeout 5000ms')
         res = self.address+" OS not found"
         for ip in OSguess["scan"]:
             res=ip
-            for obj in OSguess["scan"][ip]['osmatch']:
-                res+="\n - device: "+obj['name']+", accuracy: "+obj['accuracy']+'%'
+            if 'osmatch' in OSguess["scan"][ip] and len(OSguess["scan"][ip]['osmatch'])>0:
+                for obj in OSguess["scan"][ip]['osmatch']:
+                    res+="\n - device: "+obj['name']+", accuracy: "+obj['accuracy']+'%'
+            else:
+                res+=" OS not found"
+            
+
         self.result = res
     
     
