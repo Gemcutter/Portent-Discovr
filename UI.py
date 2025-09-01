@@ -11,7 +11,7 @@ customtkinter.set_appearance_mode("light")
 
 #name to display and function to use. {name: function}, no scanning functions are available yet so all are set to -1 and nothing accesses the dict
 scan_options = {
-                "Scan_1": scanner.basicScan, 
+                "Scan_1": scanner.threadedScan, 
                 "Scan_2": lambda: -1, 
                 "Scan_3": lambda: -1, 
                 "Scan_4": lambda: -1, 
@@ -61,7 +61,7 @@ def add_log(message):
     log_box.configure(state="normal") #enable temporarily to insert text
     log_box.insert(tk.END, f"{time_now()} - {message}\n") #adds timestamp to line
     log_box.see(tk.END)  # Auto-scroll to bottom
-    log_box.configure(state="disabled") #disable again
+    #log_box.configure(state="disabled") #disable again
     root.update_idletasks()
 
 def time_now():

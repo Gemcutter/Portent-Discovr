@@ -1,21 +1,22 @@
 import nmap
 import socket
-import asyncio
+import threading
 import time
+
 
 # simple merge sort to re-order the ips for readability
 def mergeSortHostByValue(li):
-    # if list length is 1 return the list to previous call
+    
     length = len(li)
     if length<2:
         return li
-    # split the list in half and send down a layer to sort the smaller lists
+    
     first = mergeSortHostByValue(li[:int(length/2)])
     last = mergeSortHostByValue(li[int(length/2):])
     tmp = []
 
     for i in range(length):
-        # if either array is empty, append the value from the other and skip the remaining code
+        
         if len(first)==0:
             tmp.append(last.pop(0))
             continue
@@ -65,7 +66,7 @@ def basicScan(add_log):
         myHostList.append(host)
 
     # run a secondary scan to determine operating systems of located devices
-    OSguess = nm.scan(hosts=" ".join(myHostList), arguments='-O --host-timeout 7000ms -f') # -p21-25,80,139,443
+    OSguess = nm.scan(hosts=myHostList[0], arguments='-A -p- --osscan-guess --version-all -T4') # -A -p- --osscan-guess --version-all -T4 -oN
     add_log(OSguess)
     # print the obtained information
     for ip in OSguess["scan"]:
@@ -74,3 +75,58 @@ def basicScan(add_log):
             add_log("device: "+obj['name']+", accuracy: "+obj['accuracy'])
     # done!
     add_log("Complete")
+
+
+def threadedScan(add_log):
+    start = time.time()
+
+    hostname = socket.gethostname()
+    address = socket.gethostbyname(hostname)
+
+    address = address.split(".")
+    address = ".".join(address[0:3])
+
+
+    add_log("running - please wait")
+    nm = nmap.PortScanner()
+    myHostList=[]
+
+    nm.scan(hosts=address+".1-254", arguments='-sn -n -PS --host-timeout 1000ms')
+    add_log(address+".1-254 scan complete")
+    hosts_list = [(x, nm[x]['status']['state']) for x in nm.all_hosts()]
+    hosts_list = mergeSortHostByValue(hosts_list) 
+
+    threadList = []
+
+    for host, status in hosts_list:
+        add_log(host+': '+status)
+        myHostList.append(host)
+        t = MyThread(host, nm)
+        t.start()
+        threadList.append(t)
+
+    for t in threadList:
+        t.join()
+        add_log(t.result)
+    print(f"Execution time: {time.time() - start:.6f} seconds")
+
+    
+class MyThread(threading.Thread):
+    def __init__(self, address, nm):
+        super().__init__()
+        self.result = address+" OS not found"
+        self.address = address
+        self.nm = nm
+
+    def run(self):
+        OSguess = self.nm.scan(hosts=self.address, arguments='-O --host-timeout 7000ms')
+        res = self.address+" OS not found"
+        for ip in OSguess["scan"]:
+            res=ip
+            for obj in OSguess["scan"][ip]['osmatch']:
+                res+="\n - device: "+obj['name']+", accuracy: "+obj['accuracy']+'%'
+        self.result = res
+    
+    
+    
+
