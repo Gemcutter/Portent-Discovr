@@ -2,10 +2,8 @@ import ipaddress
 import socket
 from scapy.all import ARP, Ether, srp
 
-# manual ip address to scan,currenly not in use
-#target_ip = "10.136.249.0/24"  
 
-def subnet_mask_to_cidr(subnet_mask):
+def convertSubnetmaskToCidr(subnet_mask):
     #Converts a subnet mask string (e.g., "255.255.255.0") to its CIDR value.
     octets = subnet_mask.split('.')
     binary_string = ""
@@ -17,21 +15,22 @@ def subnet_mask_to_cidr(subnet_mask):
     cidr = binary_string.count('1')
     return cidr
 
-def get_network_range(cidr):
+def getNetworkRange(cidr):
     network = ipaddress.ip_network(cidr, strict=False)
     return network.network_address, network.broadcast_address
 
-# yoinking missy's host ip grabber from scanner.py
+# yoinking missy's host ip detection from scanner.py
 # get local ipv4
 hostname = socket.gethostname()
 address = socket.gethostbyname(hostname)
 
 subnetMask = "255.255.128.0"  # Uni subnet mask = "255.255.128.0", need to find a way to get this dynamically. Worst case, can get client to just run ipconfig and enter it in manually
-cidr = str(subnet_mask_to_cidr(subnetMask))
+cidr = str(convertSubnetmaskToCidr(subnetMask))
 FullAddress = address +'/'+ cidr
 print(FullAddress)
 
-start, end = get_network_range(FullAddress)
+# display network range
+start, end = getNetworkRange(FullAddress)
 print(f"Network: {FullAddress}")
 print(f"Start IP: {start}")
 print(f"End IP:   {end}")

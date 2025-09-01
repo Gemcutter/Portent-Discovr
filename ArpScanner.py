@@ -9,13 +9,13 @@ hostname = socket.gethostname()
 address = socket.gethostbyname(hostname)
 
 
-target = address + "/" + "24" # change the 24 to your network's CIDR. Looking to automate in the future
+target = address + "/" + "24" # change the 24 to the network's CIDR. Looking to automate in the future
 
 print("Scanning IP Range: " + target)
 
 # create ARP broadcast packet
 packet = Ether(dst="ff:ff:ff:ff:ff:ff") / ARP(pdst=target)
-result = srp(packet, timeout=2, verbose=False)[0]
+result = srp(packet, timeout=4, verbose=False)[0]
 
 for host, received in result:
     try:
