@@ -2,7 +2,8 @@ import nmap
 import socket
 import threading
 import time
-
+import netifaces
+from ipaddress import IPv4Interface
 
 # simple merge sort to re-order the ips for readability
 def mergeSortHostByValue(li):
@@ -40,10 +41,8 @@ def basicScan(add_log):
     hostname = socket.gethostname()
     address = socket.gethostbyname(hostname)
 
-    # break down the ip to get the first 3 quarters only
     address = address.split(".")
     address = ".".join(address[0:3])
-
 
     add_log("running - please wait")
     # build scanner
@@ -79,36 +78,57 @@ def basicScan(add_log):
 
 def threadedScan(add_log):
     start = time.time()
-
+    
     hostname = socket.gethostname()
     address = socket.gethostbyname(hostname)
+    
+    x = get_default_interface()
+    netmask = x.with_netmask.split('/')[1]
+    netmaskBinary = decimalToBinary(netmask.split("."))
+    
+    wipeKey = 0
+    for i in range(len(netmaskBinary)):
+        if int(netmaskBinary[i]) == 1:
+            wipeKey = i+1
+    padding0 = ""
+    padding1 = ""
+    for i in range(32-wipeKey):
+        padding0+="0"
+        padding1+="1"
+    minSearch = decimalToBinary(address.split("."))[:wipeKey]+padding0
+    maxSearch = decimalToBinary(address.split("."))[:wipeKey]+padding1
+    minSearch = binaryToDecimal(minSearch)
+    maxSearch = binaryToDecimal(maxSearch)
+
 
     address = address.split(".")
     address = ".".join(address[0:3])
 
+    scanRanges = getScanRanges(minSearch, maxSearch)
 
     add_log("running - please wait")
     nm = nmap.PortScanner()
     myHostList=[]
+    for scanRange in scanRanges:
+        nm.scan(hosts=scanRange, arguments='-sn -n -PS --host-timeout 1000ms')
+        add_log(scanRange+" primary scan complete")
+        hosts_list = [(x, nm[x]['status']['state']) for x in nm.all_hosts()]
+        hosts_list = mergeSortHostByValue(hosts_list) 
 
-    nm.scan(hosts=address+".1-254", arguments='-sn -n -PS --host-timeout 1000ms')
-    add_log(address+".1-254 scan complete")
-    hosts_list = [(x, nm[x]['status']['state']) for x in nm.all_hosts()]
-    hosts_list = mergeSortHostByValue(hosts_list) 
+        threadList = []
 
-    threadList = []
+        for host, status in hosts_list:
+            add_log(host+': '+status)
+            myHostList.append(host)
+            t = MyThread(host, nm)
+            t.start()
+            threadList.append(t)
 
-    for host, status in hosts_list:
-        add_log(host+': '+status)
-        myHostList.append(host)
-        t = MyThread(host, nm)
-        t.start()
-        threadList.append(t)
-
-    for t in threadList:
-        t.join()
-        add_log(t.result)
+        for t in threadList:
+            t.join()
+            add_log(t.result)
     print(f"Execution time: {time.time() - start:.6f} seconds")
+
 
     
 class MyThread(threading.Thread):
@@ -133,5 +153,50 @@ class MyThread(threading.Thread):
         self.result = res
     
     
-    
+def getScanRanges(myMin, myMax):
+    scanRanges = []
+    myMin = myMin.split(".")
+    myMax = myMax.split(".")
+    if myMin[2] != myMax[2]:
+        for i in range(myMax[2]-myMin[2]):
+            scanRanges.append(f"{myMin[0]}.{myMin[1]}.{myMin[2]+i}.1-254")
+    else:
+        scanRanges.append(f"{myMin[0]}.{myMin[1]}.{myMin[2]}.{myMin[3]}-{myMax[3]}")
+    return scanRanges
 
+def decimalToBinary(n):
+    li = ''
+    for i in n:
+        li+=str(format(int(i), f'0{8}b'))
+    return li
+
+def binaryToDecimal(n):
+    n = [n[0:8],n[8:16],n[16:24],n[24:32]]
+    li = ''
+    for i in n:
+        sum = 0
+        for j in range(8):
+            sum += int(i[j])*2**(7-j)
+        li+=str(sum)+"."
+    return li[:len(li)-1]
+
+def get_default_interface(target: tuple[str, int] | None = None) -> IPv4Interface:
+    """Return the network interface used to connect to target."""
+    if target is None:
+        target = ("8.8.8.8", 80)  # Google DNS server address
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(target)
+            ip_address = s.getsockname()[0]
+    except Exception as e:
+        print(f"Failed to auto-detect IP address: {e}")
+        ip_address = "127.0.0.1"  # fallback to localhost
+    try:
+        for dev in netifaces.interfaces():
+            for items in netifaces.ifaddresses(dev).values():
+                for item in items:
+                    if item["addr"] == ip_address:
+                        return IPv4Interface(f"{ip_address}/{item['mask']}")
+    except Exception as e:
+        print(f"Failed to auto-detect network interface: {e}")
+    return IPv4Interface("127.0.0.1/24")  # fallback to localhost
