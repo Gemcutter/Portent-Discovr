@@ -130,11 +130,12 @@ def cloud_login_window(mode): #my own worse CTkInputDialogue with 2 spaces for i
     
 
     if mode == "Azure":
-        tenant_id_entry = CTkEntry(window,placeholder_text="Tenant ID:")
-        tenant_id_entry.grid(row=1, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
-
         subscription_id_entry = CTkEntry(window,placeholder_text="Subscription ID: (needed if using env vars)")
-        subscription_id_entry.grid(row=2, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
+        subscription_id_entry.grid(row=1, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
+    
+        tenant_id_entry = CTkEntry(window,placeholder_text="Tenant ID:")
+        tenant_id_entry.grid(row=2, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
+
 
         client_id_entry = CTkEntry(window,placeholder_text="Client ID:")
         client_id_entry.grid(row=3, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
