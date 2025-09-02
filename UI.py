@@ -27,7 +27,10 @@ def resource_path(filename): #to get iconimage working
         return os.path.join(sys._MEIPASS, filename)
     return filename  # Running normally
 
+
+activeScanning = [False]
 def execute():
+    global activeScanning
     try: #its error time
         if combobox.get():
             selected_scan = combobox.get()
@@ -45,11 +48,12 @@ def execute():
                         scan_options[selected_scan](results)
 
                 else:
-                    add_log(f"beginning scan, this might take up to a few minutes")
-                    # --------------------- this method is potentially dodgy and should be revisited. ----------------------
-                    t = threading.Thread(target=scan_options[selected_scan], args=(add_log,entry.get()))
-                    t.start()
-                    #add_log(f"{selected_scan} results as follows: \n{scan_options[selected_scan]()} ")
+# --------------------- this method is potentially dodgy and should be revisited. ----------------------
+                    if not activeScanning[0]:
+                        add_log(f"beginning scan, this might take up to a few minutes")
+                        activeScanning[0] = True
+                        t = threading.Thread(target=scan_options[selected_scan], args=(add_log,activeScanning,))
+                        t.start()
 
     except Exception as e:
         add_log(e)

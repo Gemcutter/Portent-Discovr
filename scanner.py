@@ -36,7 +36,7 @@ def mergeSortHostByValue(li):
             tmp.append(last.pop(0))
     return tmp
 
-def basicScan(add_log, args):
+def basicScan(add_log, activeScanning):
     # get local ipv4
     hostname = socket.gethostname()
     address = socket.gethostbyname(hostname)
@@ -57,7 +57,6 @@ def basicScan(add_log, args):
     hosts_list = [(x, nm[x]['status']['state']) for x in nm.all_hosts()]
     # sort the ip list
     hosts_list = mergeSortHostByValue(hosts_list) 
-
     # print the ips and their status
     for host, status in hosts_list:
         add_log(host+': '+status)
@@ -65,8 +64,8 @@ def basicScan(add_log, args):
         myHostList.append(host)
 
     # run a secondary scan to determine operating systems of located devices
-    OSguess = nm.scan(hosts=myHostList[0], arguments='-A -p- --osscan-guess --version-all -T4') # -A -p- --osscan-guess --version-all -T4 -oN
-    add_log(OSguess)
+    OSguess = nm.scan(hosts=myHostList[0], arguments='-O --host-timeout 5000ms') # -A -p- --osscan-guess --version-all -T4 -oN
+    
     # print the obtained information
     for ip in OSguess["scan"]:
         add_log("ip: "+ip)
@@ -74,11 +73,12 @@ def basicScan(add_log, args):
             add_log("device: "+obj['name']+", accuracy: "+obj['accuracy'])
     # done!
     add_log("Complete")
+    activeScanning[0] = False
 
 # threadedScan will do a primary scan and then complete a secondary scan for each host found,
 # threading the secondary scans to run concurrently
 
-def threadedScan(add_log, args):
+def threadedScan(add_log, activeScanning):
     start = time.time()
     add_log("running - please wait")
     hostname = socket.gethostname()
@@ -118,14 +118,16 @@ def threadedScan(add_log, args):
 
         for host, status in hosts_list:
             add_log(host+': '+status)
-            myHostList.append(host)
-            t = SecondaryScan(host, nm)
-            t.start()
-            threadList.append(t)
+            if status == "up":
+                myHostList.append(host)
+                t = SecondaryScan(host, nm)
+                t.start()
+                threadList.append(t)
 
         for t in threadList:
             t.join()
             add_log(t.result)
+    activeScanning[0] = False
     print(f"Execution time: {time.time() - start:.6f} seconds")
 
 
