@@ -55,7 +55,7 @@ def aws_ec2_scan(args): #must have aws cli configured, add option to manually in
         client = boto3.client('ec2',
                               aws_access_key_id=args["access_key"],
                               aws_secret_access_key=args["secret_key"],
-                              region_name=args["location"])
+                              region_name="ap-southeast-2") # temporary fix
 
     
 
