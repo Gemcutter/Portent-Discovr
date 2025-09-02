@@ -9,6 +9,8 @@ import threading
 
 customtkinter.set_appearance_mode("light")
 
+
+
 #name to display and function to use. {name: function}, no scanning functions are available yet so all are set to -1 and nothing accesses the dict
 scan_options = {
                 "Scan_1": scanner.threadedScan, 
@@ -24,7 +26,11 @@ def resource_path(filename): #to get iconimage working
         return os.path.join(sys._MEIPASS, filename)
     return filename  # Running normally
 
+
+activeScanning = False
+
 def execute():
+    global activeScanning
     try: #its error time
         if combobox.get():
             selected_scan = combobox.get()
@@ -41,10 +47,13 @@ def execute():
                         add_log("missing username and/or password")
 
                 else:
-                    add_log(f"beginning scan, this might take up to a few minutes")
+                    
                     # --------------------- this method is potentially dodgy and should be revisited. ----------------------
-                    t = threading.Thread(target=scan_options[selected_scan], args=(add_log,))
-                    t.start()
+                    if not activeScanning:
+                        add_log(f"beginning scan, this might take up to a few minutes")
+                        activeScanning = True
+                        t = threading.Thread(target=scan_options[selected_scan], args=(add_log,activeScanning))
+                        t.start()
                     #add_log(f"{selected_scan} results as follows: \n{scan_options[selected_scan]()} ")
 
     except Exception as e:
