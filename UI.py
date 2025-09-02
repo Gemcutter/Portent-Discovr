@@ -27,7 +27,7 @@ def resource_path(filename): #to get iconimage working
     return filename  # Running normally
 
 
-activeScanning = False
+activeScanning = [False]
 
 def execute():
     global activeScanning
@@ -48,10 +48,13 @@ def execute():
 
                 else:
                     
-                    # --------------------- this method is potentially dodgy and should be revisited. ----------------------
-                    if not activeScanning:
+# --------------------- this method is potentially dodgy and should be revisited. ----------------------
+                    print(activeScanning)
+                    if not activeScanning[-1]:
+                        if len(activeScanning)>1:
+                            activeScanning = activeScanning[-1:]
                         add_log(f"beginning scan, this might take up to a few minutes")
-                        activeScanning = True
+                        activeScanning[-1] = True
                         t = threading.Thread(target=scan_options[selected_scan], args=(add_log,activeScanning))
                         t.start()
                     #add_log(f"{selected_scan} results as follows: \n{scan_options[selected_scan]()} ")

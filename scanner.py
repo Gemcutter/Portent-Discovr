@@ -126,7 +126,7 @@ def threadedScan(add_log, activeScanning):
         for t in threadList:
             t.join()
             add_log(t.result)
-    activeScanning = False
+    activeScanning.append(False)
     print(f"Execution time: {time.time() - start:.6f} seconds")
 
 
