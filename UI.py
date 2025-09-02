@@ -5,13 +5,13 @@ from customtkinter import CTkInputDialog, CTkToplevel, CTkButton, CTkEntry, CTkL
 import time
 import sys, os
 import scanner
-
+import threading
 
 customtkinter.set_appearance_mode("light")
 
 #name to display and function to use. {name: function}, no scanning functions are available yet so all are set to -1 and nothing accesses the dict
 scan_options = {
-                "Scan_1": scanner.basicScan, 
+                "Scan_1": scanner.threadedScan, 
                 "Scan_2": lambda: -1, 
                 "Scan_3": lambda: -1, 
                 "Scan_4": lambda: -1, 
@@ -42,7 +42,9 @@ def execute():
 
                 else:
                     add_log(f"beginning scan, this might take up to a few minutes")
-                    scan_options[selected_scan](add_log)
+                    # --------------------- this method is potentially dodgy and should be revisited. ----------------------
+                    t = threading.Thread(target=scan_options[selected_scan], args=(add_log,))
+                    t.start()
                     #add_log(f"{selected_scan} results as follows: \n{scan_options[selected_scan]()} ")
 
     except Exception as e:
