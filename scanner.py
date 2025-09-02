@@ -78,7 +78,7 @@ def basicScan(add_log, args):
 # threadedScan will do a primary scan and then complete a secondary scan for each host found,
 # threading the secondary scans to run concurrently
 
-def threadedScan(add_log):
+def threadedScan(add_log, args):
     start = time.time()
     add_log("running - please wait")
     hostname = socket.gethostname()

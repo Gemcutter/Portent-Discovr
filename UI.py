@@ -47,7 +47,7 @@ def execute():
                 else:
                     add_log(f"beginning scan, this might take up to a few minutes")
                     # --------------------- this method is potentially dodgy and should be revisited. ----------------------
-                    t = threading.Thread(target=scan_options[selected_scan], args=(add_log,))
+                    t = threading.Thread(target=scan_options[selected_scan], args=(add_log,entry.get()))
                     t.start()
                     #add_log(f"{selected_scan} results as follows: \n{scan_options[selected_scan]()} ")
 
@@ -161,8 +161,8 @@ root.geometry("800x500")
 root.resizable(False, False)
 
 #change little icon
-iconimage = tk.PhotoImage(file=resource_path("Triskele.png"))
-root.iconphoto(True, iconimage)
+#iconimage = tk.PhotoImage(file=resource_path("Triskele.png")) TODO: broken, fix
+#root.iconphoto(True, iconimage)
 
 
 # Menu bar
