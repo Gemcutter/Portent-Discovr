@@ -75,10 +75,12 @@ def basicScan(add_log):
     # done!
     add_log("Complete")
 
+# threadedScan will do a primary scan and then complete a secondary scan for each host found,
+# threading the secondary scans to run concurrently
 
 def threadedScan(add_log):
     start = time.time()
-    
+    add_log("running - please wait")
     hostname = socket.gethostname()
     address = socket.gethostbyname(hostname)
     
@@ -86,28 +88,27 @@ def threadedScan(add_log):
     netmask = x.with_netmask.split('/')[1]
     netmaskBinary = decimalToBinary(netmask.split("."))
     ipBinary = decimalToBinary(address.split("."))
-
+    
     ipBaseBinary = ""
     for i in range(len(netmaskBinary)):
         if int(netmaskBinary[i]) == 1:
             ipBaseBinary+=ipBinary[i]
         else:
             ipBaseBinary+="X"
-
+    
     minSearch = binaryToDecimal(ipBaseBinary.replace("X","0"))
     maxSearch = binaryToDecimal(ipBaseBinary.replace("X","1"))
-
-
+    
     address = address.split(".")
     address = ".".join(address[0:3])
-
+    
     scanRanges = getScanRanges(minSearch, maxSearch)
 
-    add_log("running - please wait")
     add_log(f"Scan range is from {minSearch} to {maxSearch}")
     nm = nmap.PortScanner()
     myHostList=[]
     for scanRange in scanRanges:
+        add_log("Now scanning range "+scanRange)
         nm.scan(hosts=scanRange, arguments='-sn -n -PS --host-timeout 1000ms')
         add_log(scanRange+" primary scan complete")
         hosts_list = [(x, nm[x]['status']['state']) for x in nm.all_hosts()]
@@ -118,7 +119,7 @@ def threadedScan(add_log):
         for host, status in hosts_list:
             add_log(host+': '+status)
             myHostList.append(host)
-            t = MyThread(host, nm)
+            t = SecondaryScan(host, nm)
             t.start()
             threadList.append(t)
 
@@ -128,8 +129,21 @@ def threadedScan(add_log):
     print(f"Execution time: {time.time() - start:.6f} seconds")
 
 
-    
-class MyThread(threading.Thread):
+# may be used? may not. currently not in use.
+
+class PrimaryScan(threading.Thread):
+    def __init__(self, address, nm):
+        super().__init__()
+        self.result = None
+        self.address = address
+        self.nm = nm
+
+    def run(self):
+        scan = self.nm.scan(hosts=self.address, arguments='-sn -n -PS --host-timeout 1000ms')
+        self.result = scan
+
+# This class is responsible for performing a secondary scan on a single host
+class SecondaryScan(threading.Thread):
     def __init__(self, address, nm):
         super().__init__()
         self.result = address+" OS not found"
@@ -149,14 +163,18 @@ class MyThread(threading.Thread):
             
 
         self.result = res
-    
-    
+
+# This function generates a list of scan ranges based on the provided minimum and maximum IP addresses.
 def getScanRanges(myMin, myMax):
     scanRanges = []
     myMin = myMin.split(".")
     myMax = myMax.split(".")
+    for i in range(4):
+        myMin[i] = int(myMin[i])
+        myMax[i] = int(myMax[i])
+
     if myMin[2] != myMax[2]:
-        for i in range(myMax[2]-myMin[2]):
+        for i in range(myMax[2]-myMin[2]+1):
             scanRanges.append(f"{myMin[0]}.{myMin[1]}.{myMin[2]+i}.1-254")
     else:
         scanRanges.append(f"{myMin[0]}.{myMin[1]}.{myMin[2]}.{myMin[3]}-{myMax[3]}")
@@ -178,17 +196,18 @@ def binaryToDecimal(n):
         li+=str(sum)+"."
     return li[:len(li)-1]
 
+# This function returns the default network interface used to connect to a target IP address.
 def get_default_interface(target: tuple[str, int] | None = None) -> IPv4Interface:
     """Return the network interface used to connect to target."""
     if target is None:
-        target = ("8.8.8.8", 80)  # Google DNS server address
+        target = ("8.8.8.8", 80)
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
             s.connect(target)
             ip_address = s.getsockname()[0]
     except Exception as e:
         print(f"Failed to auto-detect IP address: {e}")
-        ip_address = "127.0.0.1"  # fallback to localhost
+        ip_address = "127.0.0.1" 
     try:
         for dev in netifaces.interfaces():
             for items in netifaces.ifaddresses(dev).values():
@@ -197,4 +216,4 @@ def get_default_interface(target: tuple[str, int] | None = None) -> IPv4Interfac
                         return IPv4Interface(f"{ip_address}/{item['mask']}")
     except Exception as e:
         print(f"Failed to auto-detect network interface: {e}")
-    return IPv4Interface("127.0.0.1/24")  # fallback to localhost
+    return IPv4Interface("127.0.0.1/24") 

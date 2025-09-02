@@ -5,7 +5,7 @@ from customtkinter import CTkInputDialog, CTkToplevel, CTkButton, CTkEntry, CTkL
 import time
 import sys, os
 import scanner
-
+import threading
 
 customtkinter.set_appearance_mode("light")
 
@@ -42,7 +42,9 @@ def execute():
 
                 else:
                     add_log(f"beginning scan, this might take up to a few minutes")
-                    scan_options[selected_scan](add_log)
+                    # --------------------- this method is potentially dodgy and should be revisited. ----------------------
+                    t = threading.Thread(target=scan_options[selected_scan], args=(add_log,))
+                    t.start()
                     #add_log(f"{selected_scan} results as follows: \n{scan_options[selected_scan]()} ")
 
     except Exception as e:
@@ -61,7 +63,7 @@ def add_log(message):
     log_box.configure(state="normal") #enable temporarily to insert text
     log_box.insert(tk.END, f"{time_now()} - {message}\n") #adds timestamp to line
     log_box.see(tk.END)  # Auto-scroll to bottom
-    #log_box.configure(state="disabled") #disable again
+    log_box.configure(state="disabled") #disable again
     root.update_idletasks()
 
 def time_now():

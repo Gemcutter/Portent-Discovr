@@ -1,2 +1,2 @@
 from UI import root
-root.mainloop()
+target=root.mainloop()
