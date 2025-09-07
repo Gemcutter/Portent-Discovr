@@ -9,7 +9,7 @@ hostname = socket.gethostname()
 address = socket.gethostbyname(hostname)
 
 
-target = address + "/" + "24" # change the 24 to the network's CIDR. Looking to automate in the future
+target = address + "/" + "24" # change the 24 to the network's CIDR. 
 
 print("Scanning IP Range: " + target)
 
