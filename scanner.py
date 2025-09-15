@@ -107,6 +107,7 @@ def threadedScan(add_log, activeScanning, args):
     add_log(f"Scan range is from {minSearch} to {maxSearch}")
     nm = nmap.PortScanner()
     myHostList=[]
+    # scan each range in scanRanges
     for scanRange in scanRanges:
         add_log("Now scanning range "+scanRange)
         nm.scan(hosts=scanRange, arguments='-sn -n -PS --host-timeout 1000ms')
@@ -115,7 +116,7 @@ def threadedScan(add_log, activeScanning, args):
         hosts_list = mergeSortHostByValue(hosts_list) 
 
         threadList = []
-
+        # print the ips and their status
         for host, status in hosts_list:
             add_log(host+': '+status)
             if status == "up":
@@ -199,23 +200,22 @@ def binaryToDecimal(n):
     return li[:len(li)-1]
 
 # This function returns the default network interface used to connect to a target IP address.
-def get_default_interface(target: tuple[str, int] | None = None) -> IPv4Interface:
-    """Return the network interface used to connect to target."""
+def getDefaultInterface(target: tuple[str, int] | None = None) -> IPv4Interface:
     if target is None:
         target = ("8.8.8.8", 80)
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
             s.connect(target)
-            ip_address = s.getsockname()[0]
+            ipAddress = s.getsockname()[0]
     except Exception as e:
         print(f"Failed to auto-detect IP address: {e}")
-        ip_address = "127.0.0.1" 
+        ipAddress = "127.0.0.1" 
     try:
         for dev in netifaces.interfaces():
             for items in netifaces.ifaddresses(dev).values():
                 for item in items:
-                    if item["addr"] == ip_address:
-                        return IPv4Interface(f"{ip_address}/{item['mask']}")
+                    if item["addr"] == ipAddress:
+                        return IPv4Interface(f"{ipAddress}/{item['mask']}")
     except Exception as e:
         print(f"Failed to auto-detect network interface: {e}")
     return IPv4Interface("127.0.0.1/24") 
