@@ -1,4 +1,4 @@
-from tkinter import scrolledtext, ttk, messagebox, END, Tk, Menu, WORD
+from tkinter import scrolledtext, ttk, messagebox, END, Tk, Menu, WORD, PhotoImage
 from customtkinter import CTkInputDialog, CTkToplevel, CTkButton, CTkEntry, CTkLabel, CTkComboBox, set_appearance_mode
 from time import localtime
 import sys, os
@@ -162,8 +162,8 @@ root.geometry("800x500")
 root.resizable(False, False)
 
 #change little icon
-#iconimage = tk.PhotoImage(file=resource_path("Triskele.png")) TODO: broken, fix
-#root.iconphoto(True, iconimage)
+iconimage = PhotoImage(file=resource_path("Triskele.png")) #TODO: broken, fix
+root.iconphoto(True, iconimage)
 
 
 # Menu bar
