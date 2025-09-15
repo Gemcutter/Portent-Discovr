@@ -1,7 +1,9 @@
-pyinstaller --onefile --noconsole ^
-  --hidden-import=tkinter ^
-  --hidden-import=tkinter.ttk ^
-  --hidden-import=tkinter.scrolledtext ^
-  --hidden-import=customtkinter ^
-  --add-data "Triskele.png;." ^
-  main.py
+Windows:
+pyinstaller --onefile --noconsole --add-data "Triskele.png;." main.py
+
+Linux:
+pyinstaller --onefile --noconsole --add-data "Triskele.png:." main.py
+
+
+Try:
+--strip | might break things on windows

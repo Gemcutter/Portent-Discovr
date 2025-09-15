@@ -1,8 +1,6 @@
-import tkinter as tk
-from tkinter import scrolledtext, ttk, messagebox
-import customtkinter
-from customtkinter import CTkInputDialog, CTkToplevel, CTkButton, CTkEntry, CTkLabel, CTkComboBox
-import time
+from tkinter import scrolledtext, ttk, messagebox, END, Tk, Menu, WORD
+from customtkinter import CTkInputDialog, CTkToplevel, CTkButton, CTkEntry, CTkLabel, CTkComboBox, set_appearance_mode
+from time import localtime
 import sys, os
 
 import scanner
@@ -10,8 +8,7 @@ import threading
 import ArpScanner
 import cloudScanner
 
-
-customtkinter.set_appearance_mode("light")
+set_appearance_mode("light")
 
 #name to display and function to use. {name: function}, no scanning functions are available yet so all are set to -1 and nothing accesses the dict
 scan_options = {
@@ -69,13 +66,13 @@ def on_save():
 
 def add_log(message):
     log_box.configure(state="normal") #enable temporarily to insert text
-    log_box.insert(tk.END, f"{time_now()} - {message}\n") #adds timestamp to line
-    log_box.see(tk.END)  # Auto-scroll to bottom
+    log_box.insert(END, f"{time_now()} - {message}\n") #adds timestamp to line
+    log_box.see(END)  # Auto-scroll to bottom
     log_box.configure(state="disabled") #disable again
     root.update_idletasks()
 
 def time_now():
-    t = time.localtime()
+    t = localtime()
     return f"{t.tm_hour}:{t.tm_min}:{t.tm_sec}"
 
 def on_exit():
@@ -159,7 +156,7 @@ def cloud_login_window(mode): #my own worse CTkInputDialogue with 2 spaces for i
 cloudScanner.add_log = add_log # set cloudscanner class output function
 
 # Main window
-root = tk.Tk()
+root = Tk()
 root.title("Discovr")
 root.geometry("800x500")
 root.resizable(False, False)
@@ -170,14 +167,14 @@ root.resizable(False, False)
 
 
 # Menu bar
-menubar = tk.Menu(root)
+menubar = Menu(root)
 
-filemenu = tk.Menu(menubar, tearoff=0)
+filemenu = Menu(menubar, tearoff=0)
 filemenu.add_command(label="Save", command=on_save)
 filemenu.add_command(label="Exit", command=on_exit)
 menubar.add_cascade(label="File", menu=filemenu)
 
-helpmenu = tk.Menu(menubar, tearoff=0)
+helpmenu = Menu(menubar, tearoff=0)
 helpmenu.add_command(label="About", command=lambda: messagebox.showinfo(" ", "You wish")) #empty messagebox title due to size restraints
 menubar.add_cascade(label="Help", menu=helpmenu)
 
@@ -217,7 +214,7 @@ exit_btn.grid(row=1, column=2, pady=10, padx=(0,20), sticky="e")
 
 log_box = scrolledtext.ScrolledText( #its the wacky fake terminal log thingymajig
     right_frame,
-    wrap=tk.WORD,
+    wrap=WORD,
     font=("Courier New", 10),
     bg="black",
     fg="lime",
