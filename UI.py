@@ -12,6 +12,7 @@ import cloudScanner
 
 
 customtkinter.set_appearance_mode("light")
+activeScanning = [False]
 
 #name to display and function to use. {name: function}, no scanning functions are available yet so all are set to -1 and nothing accesses the dict
 scan_options = {
@@ -28,7 +29,7 @@ def resource_path(filename): #to get iconimage working
     return filename  # Running normally
 
 
-activeScanning = [False]
+
 def execute():
     global activeScanning
     try: #its error time

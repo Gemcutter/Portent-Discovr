@@ -84,7 +84,7 @@ def threadedScan(add_log, activeScanning, args):
     hostname = socket.gethostname()
     address = socket.gethostbyname(hostname)
     
-    x = get_default_interface()
+    x = getDefaultInterface()
     netmask = x.with_netmask.split('/')[1]
     netmaskBinary = decimalToBinary(netmask.split("."))
     ipBinary = decimalToBinary(address.split("."))
