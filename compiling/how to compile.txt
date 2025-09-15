@@ -1,0 +1,10 @@
+Windows:
+pyinstaller --onefile --noconsole --add-data "Triskele.png;." ..\main.py
+
+Linux:
+pyinstaller --onefile --noconsole --add-data "Triskele.png:." ..\main.py
+
+
+Try:
+--strip | might break things on windows
+optimise with upx
