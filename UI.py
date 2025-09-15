@@ -54,7 +54,8 @@ def execute():
                         activeScanning[0] = True
                         t = threading.Thread(target=scan_options[selected_scan], args=(add_log,activeScanning,entry.get()))
                         t.start()
-
+                    else:
+                        add_log(f"scan already in progress")
     except Exception as e:
         add_log(e)
 
