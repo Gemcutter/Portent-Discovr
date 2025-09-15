@@ -162,7 +162,7 @@ root.geometry("800x500")
 root.resizable(False, False)
 
 #change little icon
-iconimage = PhotoImage(file=resource_path("Triskele.png")) #TODO: broken, fix
+iconimage = PhotoImage(file=resource_path("compiling\Triskele.png")) #TODO: broken, fix
 root.iconphoto(True, iconimage)
 
 
