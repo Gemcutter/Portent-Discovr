@@ -1,7 +1,7 @@
 # needs a 'pip install scapy'
 from scapy.all import ARP, Ether, srp
 import socket
-
+import networkDetection
 def arpscan(add_log,activeScanning):
 
     # yoinking missy's host ip grabber from scanner.py
@@ -10,7 +10,7 @@ def arpscan(add_log,activeScanning):
     address = socket.gethostbyname(hostname)
 
 
-    target = address + "/" + "24" # change the 24 to the network's CIDR. 
+    target = networkDetection.getSubnet() # change the 24 to the network's CIDR. 
 
     print("Scanning IP Range: " + target)
 
