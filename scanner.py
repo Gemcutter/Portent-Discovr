@@ -36,7 +36,7 @@ def mergeSortHostByValue(li):
             tmp.append(last.pop(0))
     return tmp
 
-def basicScan(add_log, activeScanning, args):
+def basicScan(add_log, activeScanning):
     # get local ipv4
     hostname = socket.gethostname()
     address = socket.gethostbyname(hostname)
@@ -78,7 +78,7 @@ def basicScan(add_log, activeScanning, args):
 # threadedScan will do a primary scan and then complete a secondary scan for each host found,
 # threading the secondary scans to run concurrently
 
-def threadedScan(add_log, activeScanning, args):
+def threadedScan(add_log, activeScanning):
     start = time.time()
     add_log("running - please wait")
     hostname = socket.gethostname()
