@@ -46,7 +46,7 @@ def execute():
 
                 else:
 # --------------------- this method is potentially dodgy and should be revisited. ----------------------
-                    if not activeScanning[0]:
+                    if activeScanning[0] == False:
                         add_log(f"beginning scan, this might take up to a few minutes")
                         activeScanning[0] = True
                         t = threading.Thread(target=scan_options[selected_scan], args=(add_log,activeScanning,entry.get()))
