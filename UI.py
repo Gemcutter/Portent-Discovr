@@ -58,13 +58,17 @@ def execute():
         add_log(e)
 
 def on_save():
-    if log_box.get("1.0", "end-1c"): #if there is logged content
-        name = file_name_query()
-        if name:
-            add_log(f"Saved to file '{name}' successfully!")
+    if activeScanning[0] == False:
+        if log_box.get("1.0", "end-1c"): #if there is logged content
+            name = file_name_query()
+            if name:
+                add_log(f"Saved to file '{name}' successfully!") #doesnt save anything atm
 
-        else:
-            add_log("Save cancelled")
+            else:
+                add_log("Save cancelled")
+    else:
+        messagebox.showwarning("Scan in progress", "Scan in progress, please wait until it has finished")
+    
 
 def add_log(message):
     log_box.configure(state="normal") #enable temporarily to insert text
