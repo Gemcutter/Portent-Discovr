@@ -83,7 +83,11 @@ def threadedScan(add_log, activeScanning):
     add_log("running - please wait")
     hostname = socket.gethostname()
     address = socket.gethostbyname(hostname)
-    
+
+    strength = 4 #the strength of the nmap scan Input must be 1-5. will add option for user to set later
+    strength = '-T' + str(strength)
+    print("Scan strength is set to " + strength)
+
     x = getDefaultInterface()
     netmask = x.with_netmask.split('/')[1]
     netmaskBinary = decimalToBinary(netmask.split("."))
@@ -110,7 +114,7 @@ def threadedScan(add_log, activeScanning):
     # scan each range in scanRanges
     for scanRange in scanRanges:
         add_log("Now scanning range "+scanRange)
-        nm.scan(hosts=scanRange, arguments='-sn -n -PS --host-timeout 1000ms')
+        nm.scan(hosts=scanRange, arguments= strength + ' -sn -n -PS --host-timeout 1000ms') # nmap scan
         add_log(scanRange+" primary scan complete")
         hosts_list = [(x, nm[x]['status']['state']) for x in nm.all_hosts()]
         hosts_list = mergeSortHostByValue(hosts_list) 

@@ -25,3 +25,5 @@ def arpscan(add_log,activeScanning):
             hostname = "Unknown"
         print(f"{received.psrc}  {received.hwsrc}  {hostname}")
     activeScanning[0] = False
+
+    print("ARP Scan Complete")
