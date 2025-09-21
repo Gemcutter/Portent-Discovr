@@ -44,6 +44,8 @@ def basicScan(add_log, activeScanning):
     address = address.split(".")
     address = ".".join(address[0:3])
 
+    strength = str(getScanStrength())
+
     add_log("running - please wait")
     # build scanner
     nm = nmap.PortScanner()
@@ -51,7 +53,7 @@ def basicScan(add_log, activeScanning):
     myHostList=[]
 
     # scan the network for devices
-    nm.scan(hosts=address+".1-254", arguments='-sn -n -PS --host-timeout 1000ms')
+    nm.scan(hosts=address+".1-254", arguments= strength + '-sn -n -PS --host-timeout 1000ms')
     add_log(address+".1-254 scan complete")
     # get hosts from the scan
     hosts_list = [(x, nm[x]['status']['state']) for x in nm.all_hosts()]
@@ -84,9 +86,7 @@ def threadedScan(add_log, activeScanning):
     hostname = socket.gethostname()
     address = socket.gethostbyname(hostname)
 
-    strength = 4 #the strength of the nmap scan Input must be 1-5. will add option for user to set later
-    strength = '-T' + str(strength)
-    print("Scan strength is set to " + strength)
+    strength = str(getScanStrength())
 
     x = getDefaultInterface()
     netmask = x.with_netmask.split('/')[1]
@@ -223,3 +223,17 @@ def getDefaultInterface(target: tuple[str, int] | None = None) -> IPv4Interface:
     except Exception as e:
         print(f"Failed to auto-detect network interface: {e}")
     return IPv4Interface("127.0.0.1/24") 
+
+def getScanStrength():
+    #try:
+    #    strength = int(input("Enter scan strength (1-5, 4 is default): "))
+    #    if strength < 1 or strength > 5:
+    #        print("Invalid input. Scan strength must be between 1 and 5. Defaulting to 4.")
+    #        strength = 4
+    #except ValueError:
+    #    strength = 4 #default to 4 if invalid input
+
+    strength = 4 #placeholder for now
+    strength = '-T' + str(strength)
+    print("Scan strength is set to " + strength)
+    return strength 
