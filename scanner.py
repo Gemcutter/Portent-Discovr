@@ -36,7 +36,7 @@ def mergeSortHostByValue(li):
             tmp.append(last.pop(0))
     return tmp
 
-def basicScan(add_log, activeScanning):
+def basicScan(add_log, activeScanning, netMap):
     # get local ipv4
     hostname = socket.gethostname()
     address = socket.gethostbyname(hostname)
@@ -78,32 +78,11 @@ def basicScan(add_log, activeScanning):
 # threadedScan will do a primary scan and then complete a secondary scan for each host found,
 # threading the secondary scans to run concurrently
 
-def threadedScan(add_log, activeScanning):
+def threadedScan(add_log, activeScanning, netMap):
     start = time.time()
     add_log("running - please wait")
-    hostname = socket.gethostname()
-    address = socket.gethostbyname(hostname)
     
-    x = getDefaultInterface()
-    netmask = x.with_netmask.split('/')[1]
-    netmaskBinary = decimalToBinary(netmask.split("."))
-    ipBinary = decimalToBinary(address.split("."))
-    
-    ipBaseBinary = ""
-    for i in range(len(netmaskBinary)):
-        if int(netmaskBinary[i]) == 1:
-            ipBaseBinary+=ipBinary[i]
-        else:
-            ipBaseBinary+="X"
-    
-    minSearch = binaryToDecimal(ipBaseBinary.replace("X","0"))
-    maxSearch = binaryToDecimal(ipBaseBinary.replace("X","1"))
-    
-    address = address.split(".")
-    address = ".".join(address[0:3])
-    
-    scanRanges = getScanRanges(minSearch, maxSearch)
-
+    scanRanges, minSearch, maxSearch = getScanRanges()
     add_log(f"Scan range is from {minSearch} to {maxSearch}")
     nm = nmap.PortScanner()
     myHostList=[]
@@ -124,51 +103,128 @@ def threadedScan(add_log, activeScanning):
                 t = SecondaryScan(host, nm)
                 t.start()
                 threadList.append(t)
-
+            
         for t in threadList:
             t.join()
-            add_log(t.result)
+            add_log(" ".join(t.result))
+            netMap.addHost(t.result[0],t.result[1])
+        add_log("Scan Complete")
     activeScanning[0] = False
     print(f"Execution time: {time.time() - start:.6f} seconds")
 
 
-# may be used? may not. currently not in use.
 
-class PrimaryScan(threading.Thread):
-    def __init__(self, address, nm):
-        super().__init__()
-        self.result = None
-        self.address = address
-        self.nm = nm
-
-    def run(self):
-        scan = self.nm.scan(hosts=self.address, arguments='-sn -n -PS --host-timeout 1000ms')
-        self.result = scan
 
 # This class is responsible for performing a secondary scan on a single host
 class SecondaryScan(threading.Thread):
     def __init__(self, address, nm):
         super().__init__()
-        self.result = address+" OS not found"
+        self.result = [address] 
         self.address = address
         self.nm = nm
 
     def run(self):
-        OSguess = self.nm.scan(hosts=self.address, arguments='-O --host-timeout 5000ms')
-        res = self.address+" OS not found"
+        OSguess = self.nm.scan(hosts=self.address, arguments='-O --host-timeout 5000ms -Pn')
+        res = ""
         for ip in OSguess["scan"]:
-            res=ip
             if 'osmatch' in OSguess["scan"][ip] and len(OSguess["scan"][ip]['osmatch'])>0:
                 for obj in OSguess["scan"][ip]['osmatch']:
                     res+="\n - device: "+obj['name']+", accuracy: "+obj['accuracy']+'%'
             else:
-                res+=" OS not found"
+                res+="OS not found"
+        if len(OSguess["scan"]) < 1:
+            res+="OS not found"
+
+        self.result.append(res)
+
+def basicPassiveScan(add_log, activeScanning, netMap):
+    '''
+    Sniffs at all possible host ips waiting for responses.
+    Probably slow as all hell and may require a lot of processing for larger networks.
+    '''
+    start = time.time()
+    
+    scanRanges, minSearch, maxSearch = getScanRanges()
+    add_log(f"Scan range is from {minSearch} to {maxSearch}")
+    nm = nmap.PortScanner()
+    threadList = []
+    for scanRange in scanRanges:
+        add_log("Now scanning range "+scanRange)
+        t = PassiveScan(scanRange, nm)
+        t.start()
+        threadList.append(t)
+    
+        for t in threadList:
+            t.join()
+            add_log(scanRange+" primary scan complete")
+            for ip in t.result:
+                if t.result[ip][0]["device"] != "OS not found":
+                    add_log(f"{ip} is probably {t.result[ip][0]['device']}")
+                else:
+                    add_log(f"{ip} OS is unknown")
+                netMap.addHost(ip, t.result[ip])
+
+    activeScanning[0] = False
+    print(f"Execution time: {time.time() - start:.6f} seconds")
+
+
+
+
+
+
+class PassiveScan(threading.Thread):
+    def __init__(self, range, nm):
+        super().__init__()
+        self.result = {}
+        self.range = range
+        self.nm = nm
+
+    def run(self):
+        OSguess = self.nm.scan(hosts=self.range, arguments='-packet-trace -O')
+        for ip in OSguess["scan"]:
+            self.result[ip]=[]
+            if 'osmatch' in OSguess["scan"][ip] and len(OSguess["scan"][ip]['osmatch'])>0:
+                for obj in OSguess["scan"][ip]['osmatch']:
+                    self.result[ip].append({"device": obj['name'], "accuracy": f"{obj['accuracy']}%"})
+            else:
+                self.result[ip].append(f"OS not found")
+
             
 
-        self.result = res
+
+
+    # scan each range in scanRanges
+    '''
+    for scanRange in scanRanges:
+        add_log("Now scanning range "+scanRange)
+        nm.scan(hosts=scanRange, arguments='-sn -n -PS --host-timeout 1000ms')
+        add_log(scanRange+" primary scan complete")
+        hosts_list = [(x, nm[x]['status']['state']) for x in nm.all_hosts()]
+        hosts_list = mergeSortHostByValue(hosts_list) 
+
+        threadList = []
+        # print the ips and their status
+        for host, status in hosts_list:
+            add_log(host+': '+status)
+            if status == "up":
+                myHostList.append(host)
+                t = SecondaryScan(host, nm)
+                t.start()
+                threadList.append(t)
+            
+        for t in threadList:
+            t.join()
+            add_log(" ".join(t.result))
+            netMap.addHost(t.result[0],t.result[1])
+        add_log("Scan Complete")
+        '''
+
+
+
+
 
 # This function generates a list of scan ranges based on the provided minimum and maximum IP addresses.
-def getScanRanges(myMin, myMax):
+def getRanges(myMin, myMax):
     scanRanges = []
     myMin = myMin.split(".")
     myMax = myMax.split(".")
@@ -219,3 +275,28 @@ def getDefaultInterface(target: tuple[str, int] | None = None) -> IPv4Interface:
     except Exception as e:
         print(f"Failed to auto-detect network interface: {e}")
     return IPv4Interface("127.0.0.1/24") 
+
+def getScanRanges():
+    hostname = socket.gethostname()
+    address = socket.gethostbyname(hostname)
+    
+    x = getDefaultInterface()
+    netmask = x.with_netmask.split('/')[1]
+    netmaskBinary = decimalToBinary(netmask.split("."))
+    ipBinary = decimalToBinary(address.split("."))
+    
+    ipBaseBinary = ""
+    for i in range(len(netmaskBinary)):
+        if int(netmaskBinary[i]) == 1:
+            ipBaseBinary+=ipBinary[i]
+        else:
+            ipBaseBinary+="X"
+    
+    minSearch = binaryToDecimal(ipBaseBinary.replace("X","0"))
+    maxSearch = binaryToDecimal(ipBaseBinary.replace("X","1"))
+    
+    address = address.split(".")
+    address = ".".join(address[0:3])
+    
+    return [getRanges(minSearch, maxSearch), minSearch, maxSearch]
+

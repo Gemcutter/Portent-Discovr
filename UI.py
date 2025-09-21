@@ -8,12 +8,38 @@ import threading
 import ArpScanner
 import cloudScanner
 
+class NetworkMap:
+    def __init__(self):
+        self.data = {}
+        self.identifiedHosts = {}
+    def addHost(self, ip, info): 
+        if ip in self.data:
+            if info != "OS not found" and self.data.get(ip) == "OS not found":
+                self.data[ip] = info
+                self.identifiedHosts[ip] = info
+        else:
+            self.data[ip] = info
+            if info != "OS not found":
+                self.identifiedHosts[ip] = info
+            
+    def getHost(self, ip):
+        return self.data.get(ip)
+    def getAllHosts(self):
+        return self.data.keys()
+    def getRelevantData(self):
+        return self.identifiedHosts
+        
+
+
+
+netMap = NetworkMap()
+
 set_appearance_mode("light")
 activeScanning = [False]
 
 #name to display and function to use. {name: function}, no scanning functions are available yet so all are set to -1 and nothing accesses the dict
 scan_options = {
-                "Basic Scan": scanner.basicScan, 
+                "Passive Scan": scanner.basicPassiveScan, 
                 "Threaded Scan": scanner.threadedScan,
                 "Arp Scan": ArpScanner.arpscan, 
                 "AWS_scan": cloudScanner.aws_ec2_scan, 
@@ -50,7 +76,7 @@ def execute():
                     if activeScanning[0] == False:
                         add_log(f"beginning scan, this might take up to a few minutes")
                         activeScanning[0] = True
-                        t = threading.Thread(target=scan_options[selected_scan], args=(add_log,activeScanning))
+                        t = threading.Thread(target=scan_options[selected_scan], args=(add_log,activeScanning, netMap))
                         t.start()
                     else:
                         add_log(f"scan already in progress")
@@ -231,6 +257,7 @@ log_box.grid(row=2, column=0, columnspan=3)
 
 
 right_frame.columnconfigure(1, weight=1)
+
 
 
 
