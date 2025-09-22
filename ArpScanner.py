@@ -2,7 +2,7 @@
 from scapy.all import ARP, Ether, srp
 import socket
 import networkDetection
-def arpscan(add_log,activeScanning,netMap):
+def arpscan(add_log,activeScanning,netMap, user_options=None):
 
     # yoinking missy's host ip grabber from scanner.py
     # get local ipv4

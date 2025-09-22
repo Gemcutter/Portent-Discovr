@@ -74,9 +74,9 @@ def execute():
                 else:
 # --------------------- this method is potentially dodgy and should be revisited. ----------------------
                     if activeScanning[0] == False:
-                        add_log(f"beginning scan, this might take up to a few minutes")
+                        add_log(f"beginning scan with args {parse_to_dict(entry.get())}, this might take up to a few minutes")
                         activeScanning[0] = True
-                        t = threading.Thread(target=scan_options[selected_scan], args=(add_log,activeScanning, netMap))
+                        t = threading.Thread(target=scan_options[selected_scan], args=(add_log,activeScanning, netMap, parse_to_dict(entry.get())))
                         t.start()
                     else:
                         add_log(f"scan already in progress")
@@ -113,6 +113,17 @@ def on_exit():
 def file_name_query():
     dialog = CTkInputDialog(text="Enter name of file to be saved", title="Save file") #possibly should add a check to see if file exists and warning if overwriting
     return dialog.get_input()
+
+def parse_to_dict(input_string):
+    options_dict = {}
+
+    split_in = input_string.split()
+
+    for argument in split_in:
+        key, arg = argument.split("=")
+        options_dict[key] = int(arg)
+
+    return options_dict
 
 def cloud_login_window(mode): #my own worse CTkInputDialogue with 2 spaces for input
     result = {"access_key": None, 
@@ -232,7 +243,7 @@ right_frame = ttk.Frame(content_frame)
 right_frame.pack(side="right", fill="both", expand=True, padx=10)
 
 CTkLabel(right_frame, text="Scan options:").grid(row=0, column=0, sticky="w")
-entry = CTkEntry(right_frame, placeholder_text="for selecting arp scan ip target", corner_radius=0, border_width=1, border_color="grey")#ttk.Entry(right_frame)
+entry = CTkEntry(right_frame, placeholder_text="Enter in form: 'optionA=4 optionb=120...'", corner_radius=0, border_width=1, border_color="grey")#ttk.Entry(right_frame)
 entry.grid(row=0, column=1, pady=5, sticky="ew")
 
 save_btn = CTkButton(right_frame, text="Save log to file", command= on_save)
