@@ -140,7 +140,7 @@ class SecondaryScan(threading.Thread):
 def basicPassiveScan(add_log, activeScanning, netMap):
     '''
     Sniffs at all possible host ips waiting for responses.
-    Probably slow as all hell and may require a lot of processing for larger networks.
+    Probably quite slow and may require a lot of processing for larger networks.
     '''
     start = time.time()
     
@@ -154,15 +154,17 @@ def basicPassiveScan(add_log, activeScanning, netMap):
         t.start()
         threadList.append(t)
     
-        for t in threadList:
-            t.join()
-            add_log(scanRange+" primary scan complete")
-            for ip in t.result:
-                if t.result[ip][0]["device"] != "OS not found":
-                    add_log(f"{ip} is probably {t.result[ip][0]['device']}")
-                else:
-                    add_log(f"{ip} OS is unknown")
-                netMap.addHost(ip, t.result[ip])
+    for t in threadList:
+        t.join()
+        add_log(t.range+" primary scan complete")
+        for ip in t.result:
+            if len(t.result[ip]) < 1:
+                continue
+            if t.result[ip][0]["device"] != "OS not found":
+                add_log(f"{ip} is probably {t.result[ip][0]['device']}")
+            else:
+                add_log(f"{ip} OS is unknown")
+            netMap.addHost(ip, t.result[ip])
 
     activeScanning[0] = False
     print(f"Execution time: {time.time() - start:.6f} seconds")
@@ -173,51 +175,28 @@ def basicPassiveScan(add_log, activeScanning, netMap):
 
 
 class PassiveScan(threading.Thread):
-    def __init__(self, range, nm):
+    def __init__(self, range, nm, timeout=60):
         super().__init__()
         self.result = {}
         self.range = range
         self.nm = nm
+        self.timeout = timeout
 
     def run(self):
-        OSguess = self.nm.scan(hosts=self.range, arguments='-packet-trace -O')
-        for ip in OSguess["scan"]:
-            self.result[ip]=[]
-            if 'osmatch' in OSguess["scan"][ip] and len(OSguess["scan"][ip]['osmatch'])>0:
-                for obj in OSguess["scan"][ip]['osmatch']:
-                    self.result[ip].append({"device": obj['name'], "accuracy": f"{obj['accuracy']}%"})
-            else:
-                self.result[ip].append(f"OS not found")
+        try:
+            OSguess = self.nm.scan(hosts=self.range, arguments=f'--packet-trace -O --host-timeout {self.timeout}s')
+            for ip in OSguess["scan"]:
+                self.result[ip]=[]
+                if 'osmatch' in OSguess["scan"][ip] and len(OSguess["scan"][ip]['osmatch'])>0:
+                    for obj in OSguess["scan"][ip]['osmatch']:
+                        self.result[ip].append({"device": obj['name'], "accuracy": f"{obj['accuracy']}%"})
+                else:
+                    self.result[ip].append({"device":"OS not found"})
+        except Exception as e:
+            print(e)
+        
 
-            
-
-
-
-    # scan each range in scanRanges
-    '''
-    for scanRange in scanRanges:
-        add_log("Now scanning range "+scanRange)
-        nm.scan(hosts=scanRange, arguments='-sn -n -PS --host-timeout 1000ms')
-        add_log(scanRange+" primary scan complete")
-        hosts_list = [(x, nm[x]['status']['state']) for x in nm.all_hosts()]
-        hosts_list = mergeSortHostByValue(hosts_list) 
-
-        threadList = []
-        # print the ips and their status
-        for host, status in hosts_list:
-            add_log(host+': '+status)
-            if status == "up":
-                myHostList.append(host)
-                t = SecondaryScan(host, nm)
-                t.start()
-                threadList.append(t)
-            
-        for t in threadList:
-            t.join()
-            add_log(" ".join(t.result))
-            netMap.addHost(t.result[0],t.result[1])
-        add_log("Scan Complete")
-        '''
+        
 
 
 
