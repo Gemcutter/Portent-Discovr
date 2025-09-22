@@ -1,5 +1,5 @@
-from tkinter import scrolledtext, ttk, messagebox, END, Tk, Menu, WORD, PhotoImage
-from customtkinter import CTkInputDialog, CTkToplevel, CTkButton, CTkEntry, CTkLabel, CTkComboBox, set_appearance_mode
+from tkinter import scrolledtext, ttk, messagebox, END, Tk, Menu, WORD, PhotoImage, Toplevel
+from customtkinter import CTkInputDialog, CTkButton, CTkEntry, CTkLabel, CTkComboBox, set_appearance_mode
 from time import localtime
 import sys, os
 
@@ -8,6 +8,7 @@ import threading
 import ArpScanner
 import cloudScanner
 from networkMap import NetworkMap
+from help_window import options_help
 
 
 
@@ -135,7 +136,7 @@ def cloud_login_window(mode): #my own worse CTkInputDialogue with 2 spaces for i
         result["use_env"] = 1
         window.destroy()
 
-    window = CTkToplevel(root)
+    window = Toplevel(root)
     window.title(f"{mode} login")
     window.resizable(False,False)
     window.attributes("-topmost", True)
@@ -197,7 +198,7 @@ filemenu.add_command(label="Exit", command=on_exit)
 menubar.add_cascade(label="File", menu=filemenu)
 
 helpmenu = Menu(menubar, tearoff=0)
-helpmenu.add_command(label="About", command=lambda: messagebox.showinfo(" ", "You wish")) #empty messagebox title due to size restraints
+helpmenu.add_command(label="Scan options", command=lambda: options_help(root))
 menubar.add_cascade(label="Help", menu=helpmenu)
 
 root.config(menu=menubar)
@@ -222,7 +223,7 @@ right_frame = ttk.Frame(content_frame)
 right_frame.pack(side="right", fill="both", expand=True, padx=10)
 
 CTkLabel(right_frame, text="Scan options:").grid(row=0, column=0, sticky="w")
-entry = CTkEntry(right_frame, placeholder_text="Enter in form: 'optionA=4 optionb=120...'", corner_radius=0, border_width=1, border_color="grey")#ttk.Entry(right_frame)
+entry = CTkEntry(right_frame, placeholder_text="Find details under help menu", corner_radius=0, border_width=1, border_color="grey")#ttk.Entry(right_frame)
 entry.grid(row=0, column=1, pady=5, sticky="ew")
 
 save_btn = CTkButton(right_frame, text="Save log to file", command= on_save)
