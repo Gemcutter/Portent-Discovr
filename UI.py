@@ -7,28 +7,7 @@ import scanner
 import threading
 import ArpScanner
 import cloudScanner
-
-class NetworkMap:
-    def __init__(self):
-        self.data = {}
-        self.identifiedHosts = {}
-    def addHost(self, ip, info): 
-        if ip in self.data:
-            if info != "OS not found" and self.data.get(ip) == "OS not found":
-                self.data[ip] = info
-                self.identifiedHosts[ip] = info
-        else:
-            self.data[ip] = info
-            if info != "OS not found":
-                self.identifiedHosts[ip] = info
-            
-    def getHost(self, ip):
-        return self.data.get(ip)
-    def getAllHosts(self):
-        return self.data.keys()
-    def getRelevantData(self):
-        return self.identifiedHosts
-        
+from networkMap import NetworkMap
 
 
 
@@ -40,7 +19,7 @@ activeScanning = [False]
 #name to display and function to use. {name: function}, no scanning functions are available yet so all are set to -1 and nothing accesses the dict
 scan_options = {
                 "Passive Scan": scanner.basicPassiveScan, 
-                "Threaded Scan": scanner.threadedScan,
+                "Active Scan": scanner.threadedScan,
                 "Arp Scan": ArpScanner.arpscan, 
                 "AWS_scan": cloudScanner.aws_ec2_scan, 
                 "Azure_scan": cloudScanner.azure_vm_scan #doesnt work with manually entered credentials?
