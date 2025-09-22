@@ -37,6 +37,10 @@ def mergeSortHostByValue(li):
     return tmp
 
 def basicScan(add_log, activeScanning, netMap, user_options=None):
+    '''
+    This function has been made redundant as everything it does is done better by threadedScan()
+    '''
+
     # get local ipv4
     hostname = socket.gethostname()
     address = socket.gethostbyname(hostname)
@@ -79,6 +83,10 @@ def basicScan(add_log, activeScanning, netMap, user_options=None):
 # threading the secondary scans to run concurrently
 
 def threadedScan(add_log, activeScanning, netMap, user_options=None):
+    '''
+    args needed for this function are: range and intensity
+    '''
+
     start = time.time()
     add_log("running - please wait")
     
@@ -141,6 +149,8 @@ def basicPassiveScan(add_log, activeScanning, netMap, user_options=None):
     '''
     Sniffs at all possible host ips waiting for responses.
     Probably slow as all hell and may require a lot of processing for larger networks.
+
+    args needed for this function: optional range & optional timeout
     '''
     start = time.time()
     
@@ -188,36 +198,6 @@ class PassiveScan(threading.Thread):
                     self.result[ip].append({"device": obj['name'], "accuracy": f"{obj['accuracy']}%"})
             else:
                 self.result[ip].append(f"OS not found")
-
-            
-
-
-
-    # scan each range in scanRanges
-    '''
-    for scanRange in scanRanges:
-        add_log("Now scanning range "+scanRange)
-        nm.scan(hosts=scanRange, arguments='-sn -n -PS --host-timeout 1000ms')
-        add_log(scanRange+" primary scan complete")
-        hosts_list = [(x, nm[x]['status']['state']) for x in nm.all_hosts()]
-        hosts_list = mergeSortHostByValue(hosts_list) 
-
-        threadList = []
-        # print the ips and their status
-        for host, status in hosts_list:
-            add_log(host+': '+status)
-            if status == "up":
-                myHostList.append(host)
-                t = SecondaryScan(host, nm)
-                t.start()
-                threadList.append(t)
-            
-        for t in threadList:
-            t.join()
-            add_log(" ".join(t.result))
-            netMap.addHost(t.result[0],t.result[1])
-        add_log("Scan Complete")
-        '''
 
 
 
