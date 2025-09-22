@@ -36,7 +36,11 @@ def mergeSortHostByValue(li):
             tmp.append(last.pop(0))
     return tmp
 
-def basicScan(add_log, activeScanning, netMap):
+def basicScan(add_log, activeScanning, netMap, user_options=None):
+    '''
+    This function has been made redundant as everything it does is done better by threadedScan()
+    '''
+
     # get local ipv4
     hostname = socket.gethostname()
     address = socket.gethostbyname(hostname)
@@ -78,7 +82,11 @@ def basicScan(add_log, activeScanning, netMap):
 # threadedScan will do a primary scan and then complete a secondary scan for each host found,
 # threading the secondary scans to run concurrently
 
-def threadedScan(add_log, activeScanning, netMap):
+def threadedScan(add_log, activeScanning, netMap, user_options=None):
+    '''
+    args needed for this function are: range and intensity
+    '''
+
     start = time.time()
     add_log("running - please wait")
     
@@ -137,10 +145,12 @@ class SecondaryScan(threading.Thread):
 
         self.result.append(res)
 
-def basicPassiveScan(add_log, activeScanning, netMap):
+def basicPassiveScan(add_log, activeScanning, netMap, user_options=None):
     '''
     Sniffs at all possible host ips waiting for responses.
-    Probably quite slow and may require a lot of processing for larger networks.
+    Probably slow as all hell and may require a lot of processing for larger networks.
+
+    args needed for this function: optional range & optional timeout
     '''
     start = time.time()
     
