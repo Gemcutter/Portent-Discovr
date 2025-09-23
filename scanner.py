@@ -82,15 +82,19 @@ def basicScan(add_log, activeScanning, netMap, user_options=None):
 # threadedScan will do a primary scan and then complete a secondary scan for each host found,
 # threading the secondary scans to run concurrently
 
-def threadedScan(add_log, activeScanning, netMap, user_options=None):
+def threadedScan(add_log, activeScanning, netMap, user_options={"rangeMin":"","rangeMax":"","intensity":4}):
     '''
     args needed for this function are: range and intensity
     '''
 
     start = time.time()
     add_log("running - please wait")
-    
-    scanRanges, minSearch, maxSearch = getScanRanges()
+    if user_options.rangeMin!="" and user_options.rangeMax!="":
+        minSearch = user_options.rangeMin
+        maxSearch = user_options.rangeMax
+        scanRanges = getRanges(minSearch, maxSearch)
+    else:
+        scanRanges, minSearch, maxSearch = getScanRanges()
     add_log(f"Scan range is from {minSearch} to {maxSearch}")
     nm = nmap.PortScanner()
     myHostList=[]
@@ -108,7 +112,7 @@ def threadedScan(add_log, activeScanning, netMap, user_options=None):
             add_log(host+': '+status)
             if status == "up":
                 myHostList.append(host)
-                t = SecondaryScan(host, nm)
+                t = SecondaryScan(host, nm, user_options.intensity)
                 t.start()
                 threadList.append(t)
             
@@ -125,14 +129,15 @@ def threadedScan(add_log, activeScanning, netMap, user_options=None):
 
 # This class is responsible for performing a secondary scan on a single host
 class SecondaryScan(threading.Thread):
-    def __init__(self, address, nm):
+    def __init__(self, address, nm, intensity):
         super().__init__()
         self.result = [address] 
         self.address = address
         self.nm = nm
+        self.intensity = intensity
 
     def run(self):
-        OSguess = self.nm.scan(hosts=self.address, arguments='-O --host-timeout 5000ms -Pn')
+        OSguess = self.nm.scan(hosts=self.address, arguments=f'-O -T{self.intensity} --host-timeout 5000ms -Pn')
         res = ""
         for ip in OSguess["scan"]:
             if 'osmatch' in OSguess["scan"][ip] and len(OSguess["scan"][ip]['osmatch'])>0:
@@ -145,7 +150,7 @@ class SecondaryScan(threading.Thread):
 
         self.result.append(res)
 
-def basicPassiveScan(add_log, activeScanning, netMap, user_options=None):
+def basicPassiveScan(add_log, activeScanning, netMap, user_options={"rangeMin":"","rangeMax":"","timeout":60}):
     '''
     Sniffs at all possible host ips waiting for responses.
     Probably slow as all hell and may require a lot of processing for larger networks.
@@ -154,13 +159,18 @@ def basicPassiveScan(add_log, activeScanning, netMap, user_options=None):
     '''
     start = time.time()
     
-    scanRanges, minSearch, maxSearch = getScanRanges()
+    if user_options.rangeMin!="" and user_options.rangeMax!="":
+        minSearch = user_options.rangeMin
+        maxSearch = user_options.rangeMax
+        scanRanges = getRanges(minSearch, maxSearch)
+    else:
+        scanRanges, minSearch, maxSearch = getScanRanges()
     add_log(f"Scan range is from {minSearch} to {maxSearch}")
     nm = nmap.PortScanner()
     threadList = []
     for scanRange in scanRanges:
         add_log("Now scanning range "+scanRange)
-        t = PassiveScan(scanRange, nm)
+        t = PassiveScan(scanRange, nm, user_options.timeout)
         t.start()
         threadList.append(t)
     
@@ -186,7 +196,7 @@ def basicPassiveScan(add_log, activeScanning, netMap, user_options=None):
 
 
 class PassiveScan(threading.Thread):
-    def __init__(self, range, nm, timeout=60):
+    def __init__(self, range, nm, timeout):
         super().__init__()
         self.result = {}
         self.range = range
