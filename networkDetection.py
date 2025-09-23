@@ -3,9 +3,10 @@ import socket
 from scapy.all import ARP, Ether, srp
 import subprocess
 import re
+import platform
 
 def convertSubnetmaskToCidr(subnet_mask):
-    #Converts a subnet mask string (e.g., "255.255.255.0") to its CIDR value.
+    #Converts a subnet mask string (e.g., "255.255.255.0") to its CIDR value (/24).
     octets = subnet_mask.split('.')
     binary_string = ""
     for octet in octets:
@@ -24,9 +25,16 @@ def getSubnet():
     hostname = socket.gethostname()
     address = socket.gethostbyname(hostname)
 
-    #get subnet mask
-    output = subprocess.check_output("ipconfig", text=True)
-    match = re.search(r"Subnet Mask.*?:\s*([\d.]+)", output)
+    # get subnet mask
+    # detect OS and run appropriate command - Needs testing on Linux
+    if platform.system() == "Windows":
+        output = subprocess.check_output("ipconfig", text=True)
+        mask_regex = r"Subnet Mask.*?:\s*([\d.]+)"
+    else:
+        output = subprocess.check_output("ifconfig", text=True)
+        mask_regex = r"Mask:([\d.]+)"
+
+    match = re.search(mask_regex, output)
     if match:
         subnetMask = match.group(1)
     else:
