@@ -8,8 +8,8 @@ OPTION=VALUE OPTION2=VALUE
 each option=value must be seperated by a space. options ARE case sensitive.
 the order of each options does not matter
 ''',
-        "passive scan": "range=TBD \ntimeout=*int - scan time in seconds*",
-        "threaded scan": "range=TBD \nintensity=*int - from 1-5, up to 7 possible but not recommended*"
+        "passive scan": "rangeMin=x.x.x.x rangeMax=x.x.x.x \ntimeout=*scan time in seconds*",
+        "threaded scan": "rangeMin=x.x.x.x rangeMax=x.x.x.x \nintensity=*1-5, up to 7 possible but not recommended*"
     }
     window = tk.Toplevel(root)
 

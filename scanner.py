@@ -82,16 +82,25 @@ def basicScan(add_log, activeScanning, netMap, user_options=None):
 # threadedScan will do a primary scan and then complete a secondary scan for each host found,
 # threading the secondary scans to run concurrently
 
-def threadedScan(add_log, activeScanning, netMap, user_options={"rangeMin":"","rangeMax":"","intensity":4}):
+def threadedScan(add_log, activeScanning, netMap, user_options=None):
     '''
     args needed for this function are: range and intensity
     '''
+    default_options = {"rangeMin":"","rangeMax":"","intensity":4}
+    if len(user_options.keys())>=1:
+        for key in default_options.keys():
+            if key in user_options.keys():
+                pass
+            else:
+                user_options[key] = default_options[key]
+    else: 
+        user_options = default_options
 
     start = time.time()
     add_log("running - please wait")
-    if user_options.rangeMin!="" and user_options.rangeMax!="":
-        minSearch = user_options.rangeMin
-        maxSearch = user_options.rangeMax
+    if user_options["rangeMin"]!="" and user_options["rangeMax"]!="":
+        minSearch = user_options["rangeMin"]
+        maxSearch = user_options["rangeMax"]
         scanRanges = getRanges(minSearch, maxSearch)
     else:
         scanRanges, minSearch, maxSearch = getScanRanges()
@@ -112,7 +121,7 @@ def threadedScan(add_log, activeScanning, netMap, user_options={"rangeMin":"","r
             add_log(host+': '+status)
             if status == "up":
                 myHostList.append(host)
-                t = SecondaryScan(host, nm, user_options.intensity)
+                t = SecondaryScan(host, nm, user_options["intensity"])
                 t.start()
                 threadList.append(t)
             
@@ -150,18 +159,28 @@ class SecondaryScan(threading.Thread):
 
         self.result.append(res)
 
-def basicPassiveScan(add_log, activeScanning, netMap, user_options={"rangeMin":"","rangeMax":"","timeout":60}):
+def basicPassiveScan(add_log, activeScanning, netMap, user_options=None):
     '''
     Sniffs at all possible host ips waiting for responses.
     Probably slow as all hell and may require a lot of processing for larger networks.
 
     args needed for this function: optional range & optional timeout
     '''
+    default_options = {"rangeMin":"","rangeMax":"","timeout":60}
+    if len(user_options.keys())>=1:
+        for key in default_options.keys():
+            if key in user_options.keys():
+                pass
+            else:
+                user_options[key] = default_options[key]
+    else: 
+        user_options = default_options
+
     start = time.time()
     
-    if user_options.rangeMin!="" and user_options.rangeMax!="":
-        minSearch = user_options.rangeMin
-        maxSearch = user_options.rangeMax
+    if user_options["rangeMin"]!="" and user_options["rangeMax"]!="":
+        minSearch = user_options["rangeMin"]
+        maxSearch = user_options["rangeMax"]
         scanRanges = getRanges(minSearch, maxSearch)
     else:
         scanRanges, minSearch, maxSearch = getScanRanges()
@@ -170,7 +189,7 @@ def basicPassiveScan(add_log, activeScanning, netMap, user_options={"rangeMin":"
     threadList = []
     for scanRange in scanRanges:
         add_log("Now scanning range "+scanRange)
-        t = PassiveScan(scanRange, nm, user_options.timeout)
+        t = PassiveScan(scanRange, nm, user_options["timeout"])
         t.start()
         threadList.append(t)
     
