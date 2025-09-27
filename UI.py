@@ -70,7 +70,7 @@ def on_save():
             name = file_name_query()
             if name:
                 save(name, netMap.toString(), log_box.get("1.0",END))
-                add_log(f"Saved to file '{name}' successfully!") #doesnt save anything atm
+                add_log(f"Saved file/s successfully!")
 
             else:
                 add_log("Save cancelled")
