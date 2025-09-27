@@ -8,7 +8,8 @@ import threading
 import ArpScanner
 import cloudScanner
 from networkMap import NetworkMap
-from help_window import options_help
+from help_window import options_help, save_help
+from save import save
 
 
 
@@ -68,6 +69,7 @@ def on_save():
         if log_box.get("1.0", "end-1c"): #if there is logged content
             name = file_name_query()
             if name:
+                save(name, netMap.toString(), log_box.get("1.0",END))
                 add_log(f"Saved to file '{name}' successfully!") #doesnt save anything atm
 
             else:
@@ -91,7 +93,7 @@ def on_exit():
     root.destroy()
 
 def file_name_query():
-    dialog = CTkInputDialog(text="Enter name of file to be saved", title="Save file") #possibly should add a check to see if file exists and warning if overwriting
+    dialog = CTkInputDialog(text="Enter name to identify created files", title="Save file")
     return dialog.get_input()
 
 def parse_to_dict(input_string):
@@ -199,6 +201,7 @@ menubar.add_cascade(label="File", menu=filemenu)
 
 helpmenu = Menu(menubar, tearoff=0)
 helpmenu.add_command(label="Scan options", command=lambda: options_help(root))
+helpmenu.add_command(label="Saving/exporting", command=lambda: save_help(root))
 menubar.add_cascade(label="Help", menu=helpmenu)
 
 root.config(menu=menubar)
@@ -226,7 +229,7 @@ CTkLabel(right_frame, text="Scan options:").grid(row=0, column=0, sticky="w")
 entry = CTkEntry(right_frame, placeholder_text="Find details under help menu", corner_radius=0, border_width=1, border_color="grey")#ttk.Entry(right_frame)
 entry.grid(row=0, column=1, pady=5, sticky="ew")
 
-save_btn = CTkButton(right_frame, text="Save log to file", command= on_save)
+save_btn = CTkButton(right_frame, text="Save to file", command= on_save)
 save_btn.grid(row=1, column=0, pady=10, sticky="w")
 
 eval_btn = CTkButton(right_frame, text="Scan", command= execute) #no longer insecure :)

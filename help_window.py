@@ -9,7 +9,7 @@ each option=value must be seperated by a space. options ARE case sensitive.
 the order of each options does not matter
 ''',
         "passive scan": "rangeMin=x.x.x.x rangeMax=x.x.x.x \ntimeout=*scan time in seconds*",
-        "threaded scan": "rangeMin=x.x.x.x rangeMax=x.x.x.x \nintensity=*1-5, up to 7 possible but not recommended*"
+        "active scan": "rangeMin=x.x.x.x rangeMax=x.x.x.x \nintensity=*1-5, up to 7 possible but not recommended*"
     }
     window = tk.Toplevel(root)
 
@@ -36,4 +36,19 @@ the order of each options does not matter
 
     threaded_textbox = tk.Text(window, height=4)
     threaded_textbox.pack()
-    threaded_textbox.insert(tk.END, custom_variable_explanations["threaded scan"])
+    threaded_textbox.insert(tk.END, custom_variable_explanations["active scan"])
+
+def save_help(root):
+    text = '''saving will create up to 2 files named NAME.csv and NAME_full_logs.txt where NAME is the given name
+
+NAME.csv will only be created if a network scan has been ran. Cloud scans will not add to NAME.csv
+NAME_full_logs.txt will be a text file containing an exact copy of what is visible in the UI log box
+'''
+    window = tk.Toplevel(root)
+
+    label = tk.Label(window, text="Save/Export details")
+    label.pack()
+
+    textbox = tk.Text(window, height=8,wrap="word")
+    textbox.pack()
+    textbox.insert(tk.END, text)
