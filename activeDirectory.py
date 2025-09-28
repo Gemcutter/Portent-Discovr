@@ -17,6 +17,9 @@ def get_domain_controller():
         if not controllerFound:
             return "No domain controller (possibly not on a domain)"
         # Fallback: Try to get domain controller via environment variable
+
+
+        # This code is unreachable
         domain_controller = socket.gethostbyname_ex(socket.getfqdn())[0]
         return domain_controller
     
@@ -24,5 +27,6 @@ def get_domain_controller():
         return f"Error finding domain controller: {errorMessage}"
 
 if __name__ == "__main__": #change to function later
+    print("-"*27)
     domainController = get_domain_controller()
     print(f"Active Domain Controller: {domainController}")

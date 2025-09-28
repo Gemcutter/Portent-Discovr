@@ -112,7 +112,6 @@ def threadedScan(add_log, activeScanning, netMap, user_options={"rangeMin":"","r
         else:
             add_log(f"Your provided intensity is invalid, using the default 4")
             nm.scan(hosts=scanRange, arguments='-sn -n -PS --host-timeout 1000ms')
-        nm.scan(hosts=scanRange, arguments='-sn -n -PS --host-timeout 1000ms')
         add_log(scanRange+" primary scan complete")
         hosts_list = [(x, nm[x]['status']['state']) for x in nm.all_hosts()]
         hosts_list = mergeSortHostByValue(hosts_list) 
@@ -130,10 +129,10 @@ def threadedScan(add_log, activeScanning, netMap, user_options={"rangeMin":"","r
                 t.start()
                 threadList.append(t)
             
-        for t in threadList:
-            t.join()
-            add_log(" ".join(t.result))
-            netMap.addHost(t.result[0],t.result[1])
+        for thread in threadList:
+            thread.join()
+            add_log(" ".join(thread.result))
+            netMap.addHost(thread.result[0],thread.result[1])
         add_log("Scan Complete")
     activeScanning[0] = False
     print(f"Execution time: {time.time() - start:.6f} seconds")
