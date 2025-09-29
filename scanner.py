@@ -85,17 +85,23 @@ def basicScan(add_log, activeScanning, netMap, user_options=None):
 
 
 
-def threadedScan(add_log, activeScanning, netMap, user_options={"rangeMin":"","rangeMax":"","intensity":4}):
+def threadedScan(add_log, activeScanning, netMap, user_options=None):
     '''
     this function takes range and intensity options
     threadedScan will do a primary scan and then complete a secondary scan for each host found,
     threading the secondary scans to run concurrently
     the obtained data is then added to the netMap object passed as a parameter
     '''
+    defaultOptions = {"rangeMin":"","rangeMax":"","intensity":4}
+    for i in defaultOptions:
+        if i not in user_options:
+            user_options[i] = defaultOptions[i]
+
     rangeMinValid, rangeMaxValid, intensityValid, timeoutValid = validateUserOptions(user_options)
+    print(user_options)
     start = time.time()
     if rangeMinValid and rangeMaxValid:
-        minSearch = user_options['rangeMin']
+        minSearch = user_options['rangeMin']    
         maxSearch = user_options['rangeMax']
         scanRanges = getRanges(minSearch, maxSearch)
     else:
@@ -166,7 +172,7 @@ class SecondaryScan(threading.Thread):
 
         self.result.append(res)
 
-  def basicPassiveScan(add_log, activeScanning, netMap, user_options={"rangeMin":"","rangeMax":"","timeout":60}):
+def basicPassiveScan(add_log, activeScanning, netMap, user_options=None):
     '''
     Sniffs at all possible host ips waiting for responses.
     It will only find active hosts, not inactive hosts.
@@ -176,6 +182,10 @@ class SecondaryScan(threading.Thread):
     args for this function: optional range & optional timeout
     '''
     start = time.time()
+    defaultOptions = {"rangeMin":"","rangeMax":"","timeout":60}
+    for i in defaultOptions:
+        if i not in user_options:
+            user_options[i] = defaultOptions[i]
     rangeMinValid, rangeMaxValid, intensityValid, timeoutValid = validateUserOptions(user_options)
 
     if rangeMinValid and rangeMaxValid:
