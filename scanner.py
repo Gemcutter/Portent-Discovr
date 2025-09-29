@@ -198,17 +198,18 @@ def basicPassiveScan(add_log, activeScanning, netMap, user_options=None):
     nm = nmap.PortScanner()
     threadList = []
     for scanRange in scanRanges:
-        add_log("Now scanning range "+scanRange)
         if timeoutValid:
+            add_log(f"Now scanning range {scanRange} with timeout {user_options['timeout']}")
             t = PassiveScan(scanRange, nm, user_options['timeout'])
         else:
+            add_log(f"Now scanning range {scanRange} with timeout {60}")
             t = PassiveScan(scanRange, nm, 60)
         t.start()
         threadList.append(t)
     
     for t in threadList:
         t.join()
-        add_log(t.range+" primary scan complete")
+        add_log(t.range+" scan complete")
         for ip in t.result:
             if len(t.result[ip]) < 1:
                 continue
