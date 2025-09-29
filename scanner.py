@@ -166,7 +166,7 @@ class SecondaryScan(threading.Thread):
 
         self.result.append(res)
 
-def basicPassiveScan(add_log, activeScanning, netMap, user_options={"rangeMin":"","rangeMax":"","timeout":60}):
+  def basicPassiveScan(add_log, activeScanning, netMap, user_options={"rangeMin":"","rangeMax":"","timeout":60}):
     '''
     Sniffs at all possible host ips waiting for responses.
     It will only find active hosts, not inactive hosts.
@@ -176,7 +176,6 @@ def basicPassiveScan(add_log, activeScanning, netMap, user_options={"rangeMin":"
     args for this function: optional range & optional timeout
     '''
     start = time.time()
-
     rangeMinValid, rangeMaxValid, intensityValid, timeoutValid = validateUserOptions(user_options)
 
     if rangeMinValid and rangeMaxValid:
