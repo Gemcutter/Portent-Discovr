@@ -1,3 +1,7 @@
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from datetime import datetime
+
 def ExportToPDF():
  def ExportToPDF(report_data, filename="Discovr_Report.pdf"):
   
