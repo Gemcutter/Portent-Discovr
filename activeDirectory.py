@@ -1,32 +1,36 @@
-import socket
-import subprocess
+from ldap3 import Server, Connection, SUBTREE, ALL_ATTRIBUTES
 
-def get_domain_controller():
-    try:
-        # Use nslookup to find the domain controller via _ldap._tcp.dc._msdcs DNS query
-        result = subprocess.check_output(['nslookup', '-type=SRV', '_ldap._tcp.dc._msdcs'], universal_newlines=True)
-        controllerFound = False
-        for line in result.splitlines():
-            if 'svr hostname' in line or 'service' in line:
-                # Extract the hostname from the line
-                parts = line.split()
-                for part in parts:
-                    if '.' in part:
-                        controllerFound = True
-                        return part
-        if not controllerFound:
-            return "No domain controller (possibly not on a domain)"
-        # Fallback: Try to get domain controller via environment variable
+# Replace with your DC information and credentials
+AD_SERVER = 'your_domain_controller_ip_or_hostname'
+AD_USERNAME = 'your_ad_username'
+AD_PASSWORD = 'your_ad_password'
+BASE_DN = 'DC=yourdomain,DC=com'  # e.g., 'DC=example,DC=com'
 
+try:
+    # Establish a connection to the AD server
+    server = Server(AD_SERVER, use_ssl=True, get_info=ALL_ATTRIBUTES) # Use use_ssl=True for LDAPS
+    conn = Connection(server, user=AD_USERNAME, password=AD_PASSWORD, auto_bind=True)
 
-        # This code is unreachable
-        domain_controller = socket.gethostbyname_ex(socket.getfqdn())[0]
-        return domain_controller
-    
-    except Exception as errorMessage:
-        return f"Error finding domain controller: {errorMessage}"
+    # Search for a specific user
+    search_filter = '(&(objectCategory=Person)(objectClass=User)(sAMAccountName=your_target_username))'
+    conn.search(search_base=BASE_DN,
+                search_filter=search_filter,
+                search_scope=SUBTREE,
+                attributes=['sAMAccountName', 'displayName', 'mail'])
 
-if __name__ == "__main__": #change to function later
-    print("-"*27)
-    domainController = get_domain_controller()
-    print(f"Active Domain Controller: {domainController}")
+    if conn.entries:
+        print("User found:")
+        for entry in conn.entries:
+            print(f"sAMAccountName: {entry.sAMAccountName}")
+            print(f"Display Name: {entry.displayName}")
+            print(f"Email: {entry.mail}")
+    else:
+        print("User not found.")
+
+except Exception as e:
+    print(f"An error occurred: {e}")
+
+finally:
+    # Unbind the connection
+    if 'conn' in locals() and conn.bound:
+        conn.unbind()
