@@ -4,10 +4,13 @@ import threading
 import time
 import netifaces
 from ipaddress import IPv4Interface
+from ValidateUserOptions import validateUserOptions
 
 # simple merge sort to re-order the ips for readability
 def mergeSortHostByValue(li):
-    
+    '''
+    Basic merge sort specialised for sorting ips
+    '''
     length = len(li)
     if length<2:
         return li
@@ -39,6 +42,7 @@ def mergeSortHostByValue(li):
 def basicScan(add_log, activeScanning, netMap, user_options=None):
     '''
     This function has been made redundant as everything it does is done better by threadedScan()
+    Kept around for posterity really
     '''
 
     # get local ipv4
@@ -79,30 +83,23 @@ def basicScan(add_log, activeScanning, netMap, user_options=None):
     add_log("Complete")
     activeScanning[0] = False
 
-# threadedScan will do a primary scan and then complete a secondary scan for each host found,
-# threading the secondary scans to run concurrently
 
-def threadedScan(add_log, activeScanning, netMap, user_options=None):
-    '''
-    args needed for this function are: range and intensity
-    '''
-    default_options = {"rangeMin":"","rangeMax":"","intensity":4}
-    if len(user_options.keys())>=1:
-        for key in default_options.keys():
-            if key in user_options.keys():
-                pass
-            else:
-                user_options[key] = default_options[key]
-    else: 
-        user_options = default_options
 
+def threadedScan(add_log, activeScanning, netMap, user_options={"rangeMin":"","rangeMax":"","intensity":4}):
+    '''
+    this function takes range and intensity options
+    threadedScan will do a primary scan and then complete a secondary scan for each host found,
+    threading the secondary scans to run concurrently
+    the obtained data is then added to the netMap object passed as a parameter
+    '''
+    rangeMinValid, rangeMaxValid, intensityValid, timeoutValid = validateUserOptions(user_options)
     start = time.time()
-    add_log("running - please wait")
-    if user_options["rangeMin"]!="" and user_options["rangeMax"]!="":
-        minSearch = user_options["rangeMin"]
-        maxSearch = user_options["rangeMax"]
+    if rangeMinValid and rangeMaxValid:
+        minSearch = user_options['rangeMin']
+        maxSearch = user_options['rangeMax']
         scanRanges = getRanges(minSearch, maxSearch)
     else:
+        add_log(f"Your provided ranges were invalid or were not entered, now scanning the full network")
         scanRanges, minSearch, maxSearch = getScanRanges()
     add_log(f"Scan range is from {minSearch} to {maxSearch}")
     nm = nmap.PortScanner()
@@ -110,7 +107,11 @@ def threadedScan(add_log, activeScanning, netMap, user_options=None):
     # scan each range in scanRanges
     for scanRange in scanRanges:
         add_log("Now scanning range "+scanRange)
-        nm.scan(hosts=scanRange, arguments='-sn -n -PS --host-timeout 1000ms')
+        if intensityValid:
+            nm.scan(hosts=scanRange, arguments=f'-sn -n -PS --host-timeout 1000ms -T{user_options["intensity"]}')
+        else:
+            add_log(f"Your provided intensity is invalid, using the default 4")
+            nm.scan(hosts=scanRange, arguments='-sn -n -PS --host-timeout 1000ms')
         add_log(scanRange+" primary scan complete")
         hosts_list = [(x, nm[x]['status']['state']) for x in nm.all_hosts()]
         hosts_list = mergeSortHostByValue(hosts_list) 
@@ -121,23 +122,29 @@ def threadedScan(add_log, activeScanning, netMap, user_options=None):
             add_log(host+': '+status)
             if status == "up":
                 myHostList.append(host)
-                t = SecondaryScan(host, nm, user_options["intensity"])
+                if intensityValid:
+                    t = SecondaryScan(host, nm, user_options['intensity'])
+                else:
+                    t = SecondaryScan(host, nm, 4)
                 t.start()
                 threadList.append(t)
             
-        for t in threadList:
-            t.join()
-            add_log(" ".join(t.result))
-            netMap.addHost(t.result[0],t.result[1])
+        for thread in threadList:
+            thread.join()
+            add_log(" ".join(thread.result))
+            netMap.addHost(thread.result[0],thread.result[1])
         add_log("Scan Complete")
     activeScanning[0] = False
     print(f"Execution time: {time.time() - start:.6f} seconds")
 
 
-
-
 # This class is responsible for performing a secondary scan on a single host
 class SecondaryScan(threading.Thread):
+    '''
+    This class performs an OS guess scan on a given host address.
+    It takes intensity as a parameter
+    '''
+
     def __init__(self, address, nm, intensity):
         super().__init__()
         self.result = [address] 
@@ -159,28 +166,21 @@ class SecondaryScan(threading.Thread):
 
         self.result.append(res)
 
-def basicPassiveScan(add_log, activeScanning, netMap, user_options=None):
+  def basicPassiveScan(add_log, activeScanning, netMap, user_options={"rangeMin":"","rangeMax":"","timeout":60}):
     '''
     Sniffs at all possible host ips waiting for responses.
-    Probably slow as all hell and may require a lot of processing for larger networks.
+    It will only find active hosts, not inactive hosts.
 
-    args needed for this function: optional range & optional timeout
+    The function takes a timeout parameter to say how long to listen at each ip before declaring it down
+
+    args for this function: optional range & optional timeout
     '''
-    default_options = {"rangeMin":"","rangeMax":"","timeout":60}
-    if len(user_options.keys())>=1:
-        for key in default_options.keys():
-            if key in user_options.keys():
-                pass
-            else:
-                user_options[key] = default_options[key]
-    else: 
-        user_options = default_options
-
     start = time.time()
-    
-    if user_options["rangeMin"]!="" and user_options["rangeMax"]!="":
-        minSearch = user_options["rangeMin"]
-        maxSearch = user_options["rangeMax"]
+    rangeMinValid, rangeMaxValid, intensityValid, timeoutValid = validateUserOptions(user_options)
+
+    if rangeMinValid and rangeMaxValid:
+        minSearch = user_options['rangeMin']
+        maxSearch = user_options['rangeMax']
         scanRanges = getRanges(minSearch, maxSearch)
     else:
         scanRanges, minSearch, maxSearch = getScanRanges()
@@ -189,7 +189,10 @@ def basicPassiveScan(add_log, activeScanning, netMap, user_options=None):
     threadList = []
     for scanRange in scanRanges:
         add_log("Now scanning range "+scanRange)
-        t = PassiveScan(scanRange, nm, user_options["timeout"])
+        if timeoutValid:
+            t = PassiveScan(scanRange, nm, user_options['timeout'])
+        else:
+            t = PassiveScan(scanRange, nm, 60)
         t.start()
         threadList.append(t)
     
@@ -215,6 +218,10 @@ def basicPassiveScan(add_log, activeScanning, netMap, user_options=None):
 
 
 class PassiveScan(threading.Thread):
+    '''
+    This class is used to scan a host range asynchronously
+    taking a timout as a parameter
+    '''
     def __init__(self, range, nm, timeout):
         super().__init__()
         self.result = {}
