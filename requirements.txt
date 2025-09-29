@@ -1,0 +1,7 @@
+customtkinter
+python-nmap
+netifaces
+scapy
+boto3
+azure-mgmt-compute
+azure-identity
