@@ -100,7 +100,7 @@ def parse_to_dict(input_string):
 
     for argument in split_in:
         key, arg = argument.split("=")
-        options_dict[key] = int(arg)
+        options_dict[key] = arg
 
     return options_dict
 
