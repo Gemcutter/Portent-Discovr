@@ -92,7 +92,7 @@ def threadedScan(add_log, activeScanning, netMap, user_options=None):
     threading the secondary scans to run concurrently
     the obtained data is then added to the netMap object passed as a parameter
     '''
-    defaultOptions = {"rangeMin":"","rangeMax":"","intensity":4}
+    defaultOptions = {"rangeMin":"","rangeMax":"","intensity":4,"timeout":5}
     for i in defaultOptions:
         if i not in user_options:
             user_options[i] = defaultOptions[i]
@@ -113,11 +113,18 @@ def threadedScan(add_log, activeScanning, netMap, user_options=None):
     # scan each range in scanRanges
     for scanRange in scanRanges:
         add_log("Now scanning range "+scanRange)
-        if intensityValid:
-            nm.scan(hosts=scanRange, arguments=f'-sn -n -PS --host-timeout 1000ms -T{user_options["intensity"]}')
+        if intensityValid and timeoutValid:
+            nm.scan(hosts=scanRange, arguments=f'-sn -n -PS --host-timeout {user_options["timeout"]}s -T{user_options["intensity"]}')
+        elif intensityValid:
+            add_log(f"Your provided timeout is invalid, using the default 5s")
+            nm.scan(hosts=scanRange, arguments=f'-sn -n -PS --host-timeout 5s -T{user_options["intensity"]}')
+        elif timeoutValid:
+            add_log(f"Your provided intensity is invalid, using the default 4")
+            nm.scan(hosts=scanRange, arguments=f'-sn -n -PS --host-timeout {user_options["timeout"]}s')
         else:
             add_log(f"Your provided intensity is invalid, using the default 4")
-            nm.scan(hosts=scanRange, arguments='-sn -n -PS --host-timeout 1000ms')
+            add_log(f"Your provided timeout is invalid, using the default 5s")
+            nm.scan(hosts=scanRange, arguments='-sn -n -PS --host-timeout 5s')
         add_log(scanRange+" primary scan complete")
         hosts_list = [(x, nm[x]['status']['state']) for x in nm.all_hosts()]
         hosts_list = mergeSortHostByValue(hosts_list) 
@@ -128,10 +135,14 @@ def threadedScan(add_log, activeScanning, netMap, user_options=None):
             add_log(host+': '+status)
             if status == "up":
                 myHostList.append(host)
-                if intensityValid:
-                    t = SecondaryScan(host, nm, user_options['intensity'])
+                if intensityValid and timeoutValid:
+                    t = SecondaryScan(host, nm, user_options['intensity'], user_options['timeout'])
+                elif intensityValid:
+                    t = SecondaryScan(host, nm, user_options['intensity'], 5)
+                elif timeoutValid:
+                    t = SecondaryScan(host, nm, 4, user_options['timeout'])
                 else:
-                    t = SecondaryScan(host, nm, 4)
+                    t = SecondaryScan(host, nm, 4, 5)
                 t.start()
                 threadList.append(t)
             
@@ -151,15 +162,16 @@ class SecondaryScan(threading.Thread):
     It takes intensity as a parameter
     '''
 
-    def __init__(self, address, nm, intensity):
+    def __init__(self, address, nm, intensity, timeout):
         super().__init__()
         self.result = [address] 
         self.address = address
         self.nm = nm
         self.intensity = intensity
+        self.timeout = timeout
 
     def run(self):
-        OSguess = self.nm.scan(hosts=self.address, arguments=f'-O -T{self.intensity} --host-timeout 5000ms -Pn')
+        OSguess = self.nm.scan(hosts=self.address, arguments=f'-O -T{self.intensity} --host-timeout {self.timeout}s -Pn')
         res = ""
         for ip in OSguess["scan"]:
             if 'osmatch' in OSguess["scan"][ip] and len(OSguess["scan"][ip]['osmatch'])>0:
