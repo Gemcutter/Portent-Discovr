@@ -20,6 +20,7 @@ the order of each options does not matter
     basic_info_textbox = tk.Text(window, height=4)
     basic_info_textbox.pack()
     basic_info_textbox.insert(tk.END, custom_variable_explanations["basic info"])
+    basic_info_textbox.configure(state="disabled")
 
 
     passive_label = tk.Label(window, text="passive scan")
@@ -28,6 +29,7 @@ the order of each options does not matter
     passive_textbox = tk.Text(window, height=4)
     passive_textbox.pack()
     passive_textbox.insert(tk.END, custom_variable_explanations["passive scan"])
+    passive_textbox.configure(state="disabled")
 
 
 
@@ -37,6 +39,7 @@ the order of each options does not matter
     threaded_textbox = tk.Text(window, height=4)
     threaded_textbox.pack()
     threaded_textbox.insert(tk.END, custom_variable_explanations["active scan"])
+    threaded_textbox.configure(state="disabled")
 
 def save_help(root):
     text = '''saving will create up to 2 files named NAME.csv and NAME_full_logs.txt where NAME is the given name
@@ -52,3 +55,4 @@ NAME_full_logs.txt will be a text file containing an exact copy of what is visib
     textbox = tk.Text(window, height=8,wrap="word")
     textbox.pack()
     textbox.insert(tk.END, text)
+    textbox.configure(state="disabled")
