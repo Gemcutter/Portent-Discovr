@@ -36,4 +36,9 @@ def ExportToPDF(report_data, filename="Discovr_Report.pdf"):
     except Exception as e:
         print(f"Error exporting report: {e}")
 
-    
+if __name__ == "__main__":
+    txt = '''lorum ipsum
+    the quick brown fox jumped over the lazy dog
+    :-('''
+
+    ExportToPDF(txt, "test.pdf")
