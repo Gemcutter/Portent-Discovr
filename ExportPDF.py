@@ -21,13 +21,12 @@ def ExportToPDF(report_data, filename="Discovr_Report.pdf"):
         # Content
         y_position = height - 100
         pdf.setFont("Helvetica", 12)
-        for line in report_data:
-            pdf.drawString(50, y_position, line)
-            y_position -= 20
-            if y_position < 50:  # Start a new page if space runs out
-                pdf.showPage()
-                pdf.setFont("Helvetica", 12)
-                y_position = height - 50
+        pdf.drawString(50, y_position, report_data)
+        y_position -= 20
+        if y_position < 50:  # Start a new page if space runs out
+            pdf.showPage()
+            pdf.setFont("Helvetica", 12)
+            y_position = height - 50
 
         # Save PDF
         pdf.save()
