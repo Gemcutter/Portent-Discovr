@@ -187,8 +187,15 @@ root.geometry("800x500")
 root.resizable(False, False)
 
 #change little icon
-iconimage = PhotoImage(file=resource_path("compiling/Triskele.png")) #TODO: broken, fix
+def resource_path(filename):
+    """Get absolute path to resource, works for dev and for PyInstaller bundle"""
+    if hasattr(sys, "_MEIPASS"):  # running as exe
+        return os.path.join(sys._MEIPASS, filename)
+    return os.path.join(os.path.abspath("."), filename)
+
+iconimage = PhotoImage(file=resource_path("Triskele.png"))
 root.iconphoto(True, iconimage)
+
 
 
 # Menu bar

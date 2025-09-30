@@ -5,7 +5,7 @@ a = Analysis(
     ['..\\main.py'],
     pathex=[],
     binaries=[],
-    datas=[('Triskele.png', '.')],
+    datas=[('..\\Triskele.png', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

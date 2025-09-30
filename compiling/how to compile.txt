@@ -1,8 +1,8 @@
 Windows:
-pyinstaller --onefile --noconsole --add-data "Triskele.png;." ..\main.py
+pyinstaller --onefile --noconsole --add-data "..\Triskele.png;." ..\main.py
 
 Linux:
-pyinstaller --onefile --noconsole --add-data "Triskele.png:." ..\main.py
+pyinstaller --onefile --noconsole --add-data "..\Triskele.png:." ..\main.py
 
 
 Try:

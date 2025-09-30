@@ -1,4 +1,6 @@
-import nmap
+from modifiedLibs import nmap
+
+
 import socket
 import threading
 import time
