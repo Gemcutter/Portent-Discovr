@@ -21,5 +21,5 @@ class NetworkMap:
     def toString(self):
         stringOut = ""
         for ip in self.data:
-            stringOut += f"{ip}, {self.data.get(ip)}\n"
+            stringOut += f"{ip}, {self.data.get(ip)[0]['device']}\n"
         return stringOut

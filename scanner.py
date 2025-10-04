@@ -232,7 +232,7 @@ def basicPassiveScan(add_log, activeScanning, netMap, user_options=None):
             else:
                 add_log(f"{ip} OS is unknown")
             netMap.addHost(ip, t.result[ip])
-
+    
     activeScanning[0] = False
     print(netMap.toString())
     print(f"Execution time: {time.time() - start:.6f} seconds")
