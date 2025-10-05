@@ -3,6 +3,7 @@ from customtkinter import CTkInputDialog, CTkButton, CTkEntry, CTkLabel, CTkComb
 from time import localtime
 import sys, os
 
+import activeDirectory
 import scanner
 import threading
 import ArpScanner
@@ -10,6 +11,7 @@ import cloudScanner
 from networkMap import NetworkMap
 from help_window import options_help, save_help
 from save import save
+
 
 
 
@@ -41,17 +43,20 @@ def execute():
             selected_scan = combobox.get()
             if selected_scan: #if there is a scan slelcted
                 if selected_scan in ["AWS_scan", "Azure_scan"]: #if aws scan chosen
-                    if selected_scan == "AWS_scan":
-                        results = cloud_login_window("AWS")
-                    elif selected_scan == "Azure_scan":
-                        results = cloud_login_window("Azure")
+                    if activeScanning[0] == False:
+                        if selected_scan == "AWS_scan":
+                            results = cloud_login_window("AWS")
+                        elif selected_scan == "Azure_scan":
+                            results = cloud_login_window("Azure")
 
 
-                    if results["cancelled"] == 1:
-                        add_log("cloud login cancelled by user")
+                        if results["cancelled"] == 1:
+                            add_log("cloud login cancelled by user")
+                        else:
+                            activeScanning[0] = True
+                            scan_options[selected_scan](add_log, activeScanning, netMap, results)
                     else:
-                        scan_options[selected_scan](results)
-
+                        add_log(f"scan already in progress")
                 else:
 # --------------------- this method is potentially dodgy and should be revisited. ----------------------
                     if activeScanning[0] == False:
@@ -75,7 +80,9 @@ def on_save():
             else:
                 add_log("Save cancelled")
     else:
-        messagebox.showwarning("Scan in progress", "Scan in progress, please wait until it has finished")
+        add_log("-"*27)
+        add_log("Scan in progress, please wait until it has finished")
+        add_log("-"*27)
     
 
 def add_log(message):
@@ -236,13 +243,13 @@ CTkLabel(right_frame, text="Scan options:").grid(row=0, column=0, sticky="w")
 entry = CTkEntry(right_frame, placeholder_text="Find details under help menu", corner_radius=0, border_width=1, border_color="grey")#ttk.Entry(right_frame)
 entry.grid(row=0, column=1, pady=5, sticky="ew")
 
-save_btn = CTkButton(right_frame, text="Save to file", command= on_save)
+save_btn = CTkButton(right_frame, text="Save to file", command=on_save)
 save_btn.grid(row=1, column=0, pady=10, sticky="w")
 
-eval_btn = CTkButton(right_frame, text="Scan", command= execute) #no longer insecure :)
+eval_btn = CTkButton(right_frame, text="Scan", command=execute) 
 eval_btn.grid(row=1, column=1, pady=10, sticky="n")
 
-exit_btn = CTkButton(right_frame, text="Exit", command= on_exit)
+exit_btn = CTkButton(right_frame, text="Exit", command=on_exit)
 exit_btn.grid(row=1, column=2, pady=10, padx=(0,20), sticky="e")
 
 log_box = scrolledtext.ScrolledText( #its the wacky fake terminal log thingymajig

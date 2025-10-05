@@ -25,7 +25,7 @@ def validateUserOptions(user_options):
     except Exception as e:
         intensityValid = False
     try:
-        if int(user_options['timeout']) < 10:
+        if int(user_options['timeout']) < 5:
             timeoutValid = False
     except Exception as e:
         timeoutValid = False
