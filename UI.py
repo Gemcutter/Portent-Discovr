@@ -51,10 +51,11 @@ def execute():
                             add_log("cloud login cancelled by user")
                         else:
                             activeScanning[0] = True
-                            scan_options[selected_scan](add_log, activeScanning, netMap, results)
+                            t = threading.Thread(target=scan_options[selected_scan], args=(add_log,activeScanning, netMap, parse_to_dict(entry.get())))
+                            t.start()
                     else:
                         add_log(f"scan already in progress")
-                if selected_scan in ["AWS_scan", "Azure_scan"]: #if aws scan chosen
+                elif selected_scan in ["AWS_scan", "Azure_scan"]: #if aws scan chosen
                     if activeScanning[0] == False:
                         if selected_scan == "AWS_scan":
                             results = cloud_login_window("AWS")
@@ -66,7 +67,8 @@ def execute():
                             add_log("cloud login cancelled by user")
                         else:
                             activeScanning[0] = True
-                            scan_options[selected_scan](add_log, activeScanning, netMap, results)
+                            t = threading.Thread(target=scan_options[selected_scan], args=(add_log,activeScanning, netMap, parse_to_dict(entry.get())))
+                            t.start()
                     else:
                         add_log(f"scan already in progress")
                 else:

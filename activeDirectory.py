@@ -35,4 +35,4 @@ def queryActiveDirectory(add_log, activeScanning, netMap, inputs):
     except Exception as e: #If domain is not connected, or incorrect credentials are given
         print(f"Active Directory query failed: {e}")
 
-    activeScanning = False
+    activeScanning[0] = False
