@@ -117,7 +117,7 @@ def threadedScan(add_log, activeScanning, netMap, user_options=None):
         add_log("Now scanning range "+scanRange)
         if intensityValid and timeoutValid:
             nm.scan(hosts=scanRange, arguments=f'-sn -n -PS --host-timeout {user_options["timeout"]}s -T{user_options["intensity"]}')
-        elif intensityValid:
+        elif intensityValid and not timeoutValid:
             add_log(f"Your provided timeout is invalid, using the default 5s")
             nm.scan(hosts=scanRange, arguments=f'-sn -n -PS --host-timeout 5s -T{user_options["intensity"]}')
         elif timeoutValid:
@@ -150,8 +150,8 @@ def threadedScan(add_log, activeScanning, netMap, user_options=None):
             
         for thread in threadList:
             thread.join()
-            add_log(" ".join(thread.result))
-            netMap.addHost(thread.result[0],thread.result[1])
+            add_log(f"{thread.result[0]} - device: {thread.result[1]}, accuracy: {thread.result[2]}")
+            netMap.addHost(thread.result[0],thread.result[1:])
         add_log("Scan Complete")
     activeScanning[0] = False
     print(f"Execution time: {time.time() - start:.6f} seconds")
@@ -174,17 +174,18 @@ class SecondaryScan(threading.Thread):
 
     def run(self):
         OSguess = self.nm.scan(hosts=self.address, arguments=f'-O -T{self.intensity} --host-timeout {self.timeout}s -Pn')
-        res = ""
         for ip in OSguess["scan"]:
             if 'osmatch' in OSguess["scan"][ip] and len(OSguess["scan"][ip]['osmatch'])>0:
                 for obj in OSguess["scan"][ip]['osmatch']:
-                    res+="\n - device: "+obj['name']+", accuracy: "+obj['accuracy']+'%'
+                    self.result.append(obj['name'])
+                    self.result.append(obj['accuracy']+"%")
+                    break
             else:
-                res+="OS not found"
+                self.result.append("OS not found")
+                self.result.append("100%")
         if len(OSguess["scan"]) < 1:
-            res+="OS not found"
-
-        self.result.append(res)
+            self.result.append("OS not found")
+            self.result.append("100%")
 
 def basicPassiveScan(add_log, activeScanning, netMap, user_options=None):
     '''
@@ -216,7 +217,7 @@ def basicPassiveScan(add_log, activeScanning, netMap, user_options=None):
             add_log(f"Now scanning range {scanRange} with timeout {user_options['timeout']}")
             t = PassiveScan(scanRange, nm, user_options['timeout'])
         else:
-            add_log(f"Now scanning range {scanRange} with timeout {60}")
+            add_log(f"Now scanning range {scanRange} with timeout 60")
             t = PassiveScan(scanRange, nm, 60)
         t.start()
         threadList.append(t)
@@ -227,8 +228,8 @@ def basicPassiveScan(add_log, activeScanning, netMap, user_options=None):
         for ip in t.result:
             if len(t.result[ip]) < 1:
                 continue
-            if t.result[ip][0]["device"] != "OS not found":
-                add_log(f"{ip} is probably {t.result[ip][0]['device']}")
+            if t.result[ip][0] != "OS not found":
+                add_log(f"{ip} is probably {t.result[ip][0]}")
             else:
                 add_log(f"{ip} OS is unknown")
             netMap.addHost(ip, t.result[ip])
@@ -261,9 +262,11 @@ class PassiveScan(threading.Thread):
                 self.result[ip]=[]
                 if 'osmatch' in OSguess["scan"][ip] and len(OSguess["scan"][ip]['osmatch'])>0:
                     for obj in OSguess["scan"][ip]['osmatch']:
-                        self.result[ip].append({"device": obj['name'], "accuracy": f"{obj['accuracy']}%"})
+                        self.result[ip].append(obj['name'])
+                        self.result[ip].append(obj['accuracy']+"%")
                 else:
-                    self.result[ip].append({"device":"OS not found"})
+                    self.result[ip].append("OS not found")
+                    self.result[ip].append("100%")
         except Exception as e:
             print(e)
         
