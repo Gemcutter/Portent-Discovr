@@ -6,4 +6,3 @@ boto3
 azure-mgmt-compute
 azure-identity
 ldap3
-socket

@@ -142,7 +142,6 @@ def cloud_login_window(mode): #my own worse CTkInputDialogue with 2 spaces for i
 
         if mode == "Azure":
             result["subscription_id"] = subscription_id_entry.get()
-            
 
         
         window.destroy()
@@ -216,6 +215,7 @@ def active_directory_window():
         result["baseDN"] = "DC=" + ",DC=".join(baseDNEntry.get().split("."))
         result["username"] = usernameEntry.get()
         result["password"] = passwordEntry.get()
+        window.destroy()
 
     label = CTkLabel(window, text="Enter domain details. This is not saved")
     label.grid(row=0, column=0, columnspan=2, padx=20, pady=20, sticky="ew")
