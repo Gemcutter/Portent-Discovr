@@ -24,7 +24,7 @@ class NetworkMap:
                 self.identifiedHosts[ip] = info
             
     def getHost(self, ip):
-        return self.data.get(ip)["devNAcc"]
+        return self.data["devNAcc"].get(ip)
     def getAllHosts(self):
         return self.data["devNAcc"].keys()
     def getRelevantData(self):
