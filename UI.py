@@ -22,13 +22,13 @@ activeScanning = [False]
 
 #name to display and function to use. {name: function}, no scanning functions are available yet so all are set to -1 and nothing accesses the dict
 scan_options = {
-                "Passive Scan": scanner.basicPassiveScan, 
-                "Active Scan": scanner.threadedScan,
-                "Arp Scan": ArpScanner.arpscan, 
-                "Active Directory Query": activeDirectory.queryActiveDirectory,
-                "AWS_scan": cloudScanner.aws_ec2_scan, 
-                "Azure_scan": cloudScanner.azure_vm_scan #doesnt work with manually entered credentials?
-                }
+    "Passive Scan": scanner.basicPassiveScan, 
+    "Active Scan": scanner.threadedScan,
+    "Arp Scan": ArpScanner.arpscan, 
+    "Active Directory Query": activeDirectory.queryActiveDirectory,
+    "AWS_scan": cloudScanner.aws_ec2_scan, 
+    "Azure_scan": cloudScanner.azure_vm_scan #doesnt work with manually entered credentials?
+    }
 
 def resource_path(filename): #to get iconimage working
     if hasattr(sys, "_MEIPASS"):  # Running from PyInstaller bundle
@@ -51,6 +51,8 @@ def execute():
                         else:
                             activeScanning[0] = True
                             scan_options[selected_scan](add_log, activeScanning, netMap, results)
+                    else:
+                        add_log(f"scan already in progress")
                 if selected_scan in ["AWS_scan", "Azure_scan"]: #if aws scan chosen
                     if activeScanning[0] == False:
                         if selected_scan == "AWS_scan":
