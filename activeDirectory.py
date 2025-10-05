@@ -2,10 +2,10 @@ from ldap3 import Server, Connection, ALL
 import socket
 
 # Example Inputs
-#domainController = 'ADDC01'
-#baseDN = 'DC=chris,DC=local'
-#username = 'CHRIS\\Administrator'
-#password = 'W0nderfu1'
+#domainController = 'ADDC01' or '192.168.20.10' Enter IP address
+#baseDN = 'DC=chris,DC=local' chris.local 
+#username = 'CHRIS\\Administrator' DOMAIN\\username
+#password = 'W0nderfu1' password
 
 #Needs to return values when called
 def queryActiveDirectory(domainController, baseDN, username, password):
