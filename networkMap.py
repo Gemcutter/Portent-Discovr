@@ -32,8 +32,8 @@ class NetworkMap:
     def toString(self):
         stringOut = "ip, device, accuracy"
         for ip in self.data["devNAcc"]:
-                stringOut+=f"\n{ip}, {self.data["devNAcc"].get(ip)[0]}, {self.data["devNAcc"].get(ip)[1]}"
+                stringOut+=f'\n{ip}, {self.data["devNAcc"].get(ip)[0]}, {self.data["devNAcc"].get(ip)[1]}'
         stringOut += "\n\nip, MAC, hostname"
         for ip in self.data["nameNMAC"]:
-            stringOut+=f"\n{ip}, {self.data["nameNMAC"].get(ip)[0]}, {self.data["nameNMAC"].get(ip)[1]}"
+            stringOut+=f'\n{ip}, {self.data["nameNMAC"].get(ip)[0]}, {self.data["nameNMAC"].get(ip)[1]}'
         return stringOut
