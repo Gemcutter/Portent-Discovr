@@ -210,7 +210,7 @@ def active_directory_window():
 
     def ok():
         result["domainControler"] = domainEntry.get()
-        result["baseDN"] = baseDNEntry.get()
+        result["baseDN"] = "DC=" + ",DC=".join(baseDNEntry.get().split("."))
         result["username"] = usernameEntry.get()
         result["password"] = passwordEntry.get()
 
