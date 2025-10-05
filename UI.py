@@ -50,7 +50,7 @@ def execute():
                             add_log("cloud login cancelled by user")
                         else:
                             activeScanning[0] = True
-                            t = threading.Thread(target=scan_options[selected_scan], args=(add_log,activeScanning, netMap, parse_to_dict(entry.get())))
+                            t = threading.Thread(target=scan_options[selected_scan], args=(add_log,activeScanning, netMap, results))
                             t.start()
                     else:
                         add_log(f"scan already in progress")
