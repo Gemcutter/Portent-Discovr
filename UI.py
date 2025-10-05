@@ -37,9 +37,9 @@ def resource_path(filename): #to get iconimage working
 
 
 
-def execute():
+def execute(): #here be dragons
     global activeScanning
-    try: #its error time
+    try:
         if combobox.get():
             selected_scan = combobox.get()
             if selected_scan: #if there is a scan slelcted
