@@ -8,7 +8,7 @@ import socket
 #password = 'W0nderfu1' password
 
 #Needs to return values when called
-def queryActiveDirectory(activeScanning, netMap, inputs):
+def queryActiveDirectory(add_log, activeScanning, netMap, inputs):
     try:
         domainController = inputs["domainController"]
         baseDN = inputs["baseDN"]
