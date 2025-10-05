@@ -197,7 +197,7 @@ def cloud_login_window(mode): #my own worse CTkInputDialogue with 2 spaces for i
     return result
 
 def active_directory_window():
-    result = {"domainControler": None, 
+    result = {"domainController": None, 
               "baseDN": None, 
               "username": None,
               "password": None}
@@ -211,7 +211,7 @@ def active_directory_window():
         window.destroy()
 
     def ok():
-        result["domainControler"] = domainEntry.get()
+        result["domainController"] = domainEntry.get()
         result["baseDN"] = "DC=" + ",DC=".join(baseDNEntry.get().split("."))
         result["username"] = usernameEntry.get()
         result["password"] = passwordEntry.get()
@@ -219,7 +219,7 @@ def active_directory_window():
     label = CTkLabel(window, text="Enter domain details. This is not saved")
     label.grid(row=0, column=0, columnspan=2, padx=20, pady=20, sticky="ew")
 
-    domainEntry = CTkEntry(window,placeholder_text="Domain Controler:")
+    domainEntry = CTkEntry(window,placeholder_text="Domain Controller:")
     baseDNEntry = CTkEntry(window,placeholder_text="baseDN:")
     usernameEntry = CTkEntry(window,placeholder_text="Username:")
     passwordEntry = CTkEntry(window,placeholder_text="Password:")

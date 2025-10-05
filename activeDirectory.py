@@ -8,8 +8,14 @@ import socket
 #password = 'W0nderfu1' password
 
 #Needs to return values when called
-def queryActiveDirectory(domainController, baseDN, username, password):
+def queryActiveDirectory(activeScanning, netMap, inputs):
     try:
+        domainController = inputs["domainController"]
+        baseDN = inputs["baseDN"]
+        username = inputs["username"]  
+        password = inputs["password"]
+
+        print(f'{domainController}, {baseDN}, {username}, {password}')
         server = Server(domainController, get_info=ALL)
         conn = Connection(server, user=username, password=password, auto_bind=True)
         conn.search(baseDN, '(objectClass=computer)', attributes=['name', 'dNSHostName', 'operatingSystem'])
@@ -28,3 +34,5 @@ def queryActiveDirectory(domainController, baseDN, username, password):
 
     except Exception as e: #If domain is not connected, or incorrect credentials are given
         print(f"Active Directory query failed: {e}")
+
+    activeScanning = False
