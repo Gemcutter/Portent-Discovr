@@ -1,5 +1,5 @@
-from tkinter import scrolledtext, ttk, messagebox, END, Tk, Menu, WORD, PhotoImage, Toplevel
-from customtkinter import CTkInputDialog, CTkButton, CTkEntry, CTkLabel, CTkComboBox, set_appearance_mode
+from tkinter import scrolledtext, ttk, END, Tk, Menu, WORD, PhotoImage, Toplevel
+from customtkinter import CTkButton, CTkEntry, CTkLabel, CTkComboBox, set_appearance_mode
 from time import localtime
 import sys, os
 
@@ -113,8 +113,39 @@ def on_exit():
     root.destroy()
 
 def file_name_query():
-    dialog = CTkInputDialog(text="Enter name to identify created files", title="Save file")
-    return dialog.get_input()
+    dialog = save_file_query(text="Enter name to identify created files", title="Save file")
+    return dialog
+
+def save_file_query(text, title):
+    result = [None]
+    def ok():
+        result[0] = file_name_entry.get()
+        window.destroy()
+
+    def cancel():
+        window.destroy()
+
+    window = Toplevel(root)
+    window.title(title)
+    window.resizable(False,False)
+    window.attributes("-topmost", True)
+
+    label = CTkLabel(window, text=text)
+    label.grid(row=0, column=0, columnspan=2, padx=20, pady=20, sticky="ew")
+
+    file_name_entry = CTkEntry(window,placeholder_text="File Name:")
+    file_name_entry.grid(row=1, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
+
+    ok = CTkButton(window, text="Ok", command= ok)
+    ok.grid(row=7,column=0, padx=(20, 10), pady=(0, 20))
+
+    cancel = CTkButton(window, text="Cancel", command= cancel)
+    cancel.grid(row=7,column=1, padx=(10, 20), pady=(0, 20))
+
+    window.wait_window()
+    
+    return result[0]
+
 
 def parse_to_dict(input_string):
     options_dict = {}
