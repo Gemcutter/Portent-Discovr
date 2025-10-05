@@ -30,8 +30,8 @@ def queryActiveDirectory(add_log, activeScanning, netMap, inputs):
                 try:
                     ip = socket.gethostbyname(dns_name)
                 except Exception:
-                    ip = 'Not found'
-            add_log(f"Name: {name}, DNS: {dns_name}, IP: {ip}, OS: {os}") #adds Hostname, DnsName, IP and OS
+                    ip = 'IP not found'
+            add_log(f"IP: {ip}, Name: {name}, OS: {os}") #adds IP, Hostname and OS
 
     except Exception as e: #If domain is not connected, or incorrect credentials are given
         add_log(f"Active Directory query failed: {e}")
