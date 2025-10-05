@@ -9,13 +9,7 @@ import socket
 
 #Needs to return values when called
 def queryActiveDirectory(add_log, activeScanning, netMap, inputs):
-    domainController = inputs["domainController"]
-    baseDN = inputs["baseDN"]
-    username = inputs["username"]  
-    password = inputs["password"]
-
-    add_log(f'{domainController}, {baseDN}, {username}, {password}')
-
+  
     try:
         domainController = inputs["domainController"]
         baseDN = inputs["baseDN"]
@@ -37,7 +31,7 @@ def queryActiveDirectory(add_log, activeScanning, netMap, inputs):
                     ip = socket.gethostbyname(dns_name)
                 except Exception:
                     ip = 'Not found'
-            add_log(f"Name: {name}, DNS: {dns_name}, IP: {ip}, OS: {os}")
+            add_log(f"Name: {name}, DNS: {dns_name}, IP: {ip}, OS: {os}") #adds Hostname, DnsName, IP and OS
 
     except Exception as e: #If domain is not connected, or incorrect credentials are given
         add_log(f"Active Directory query failed: {e}")
