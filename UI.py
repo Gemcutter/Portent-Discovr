@@ -43,6 +43,14 @@ def execute():
         if combobox.get():
             selected_scan = combobox.get()
             if selected_scan: #if there is a scan slelcted
+                if selected_scan == "Active Directory Query":
+                    if activeScanning[0] == False:
+                        results = active_directory_window()
+                        if results["cancelled"] == 1:
+                            add_log("cloud login cancelled by user")
+                        else:
+                            activeScanning[0] = True
+                            scan_options[selected_scan](add_log, activeScanning, netMap, results)
                 if selected_scan in ["AWS_scan", "Azure_scan"]: #if aws scan chosen
                     if activeScanning[0] == False:
                         if selected_scan == "AWS_scan":
@@ -185,6 +193,55 @@ def cloud_login_window(mode): #my own worse CTkInputDialogue with 2 spaces for i
     window.wait_window()
     
     return result
+
+def active_directory_window():
+    result = {"domainControler": None, 
+              "baseDN": None, 
+              "username": None,
+              "password": None}
+
+    window = Toplevel(root)
+    window.title(f"active directory login")
+    window.resizable(False,False)
+    window.attributes("-topmost", True)
+
+    def cancel():
+        window.destroy()
+
+    def ok():
+        result["domainControler"] = domainEntry.get()
+        result["baseDN"] = baseDNEntry.get()
+        result["username"] = usernameEntry.get()
+        result["password"] = passwordEntry.get()
+
+    label = CTkLabel(window, text="Enter domain details. This is not saved")
+    label.grid(row=0, column=0, columnspan=2, padx=20, pady=20, sticky="ew")
+
+    domainEntry = CTkEntry(window,placeholder_text="Domain Controler:")
+    baseDNEntry = CTkEntry(window,placeholder_text="baseDN:")
+    usernameEntry = CTkEntry(window,placeholder_text="Username:")
+    passwordEntry = CTkEntry(window,placeholder_text="Password:")
+
+    domainEntry.grid(row=1,column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
+    baseDNEntry.grid(row=2,column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
+    usernameEntry.grid(row=3,column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
+    passwordEntry.grid(row=4,column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
+
+    ok_button = CTkButton(window, text="Ok", command= ok)
+    ok_button.grid(row=7,column=0, padx=(20, 10), pady=(0, 20))
+
+    cancel_button = CTkButton(window, text="Cancel", command= cancel)
+    cancel_button.grid(row=7,column=1, padx=(10, 20), pady=(0, 20))
+
+
+    window.wait_window()
+    
+    return result
+
+
+
+
+
 
 cloudScanner.add_log = add_log # set cloudscanner class output function
 
