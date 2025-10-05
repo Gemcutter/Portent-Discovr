@@ -7,7 +7,7 @@ class NetworkMap:
         self.identifiedHosts = {}
     def addArp(self, ip, info):
         if ip in self.data["nameNMAC"]:
-            if info[1] != "Unknown" and self.data["nameNMAC"].get(ip)["nameNMAC"] == "Unknown":
+            if info[1] != "Unknown" and self.data["nameNMAC"].get(ip)[1] == "Unknown":
                 self.data["nameNMAC"][ip] = info
         else:
             self.data["nameNMAC"][ip] = info
@@ -15,7 +15,7 @@ class NetworkMap:
                 self.identifiedHosts[ip] = info
     def addHost(self, ip, info): 
         if ip in self.data["devNAcc"]:
-            if info[0] != "OS not found" and self.data["devNAcc"].get(ip)["devNAcc"] == "OS not found":
+            if info[0] != "OS not found" and self.data["devNAcc"].get(ip)[0] == "OS not found":
                 self.data["devNAcc"][ip] = info
                 self.identifiedHosts[ip] = info
         else:
