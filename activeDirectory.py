@@ -2,7 +2,7 @@ from ldap3 import Server, Connection, ALL
 import socket
 
 # Example Inputs
-#domainController = 'ADDC01'
+#domainController = 'ADDC01' or '192.168.20.10'
 #baseDN = 'DC=chris,DC=local'
 #username = 'CHRIS\\Administrator'
 #password = 'W0nderfu1'
