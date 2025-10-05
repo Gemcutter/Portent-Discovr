@@ -32,7 +32,7 @@ def queryActiveDirectory(add_log, activeScanning, netMap, inputs):
                 except Exception:
                     ip = 'IP not found'
             add_log(f"IP: {ip}, Name: {name}, OS: {os}") #adds IP, Hostname and OS
-
+            netMap.addAQQ(ip, name, os) 
     except Exception as e: #If domain is not connected, or incorrect credentials are given
         add_log(f"Active Directory query failed: {e}")
 
