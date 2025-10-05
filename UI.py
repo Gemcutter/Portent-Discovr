@@ -46,6 +46,7 @@ def execute():
                 if selected_scan == "Active Directory Query":
                     if activeScanning[0] == False:
                         results = active_directory_window()
+                        print(results)
                         if results["cancelled"] == 1:
                             add_log("cloud login cancelled by user")
                         else:
