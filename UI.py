@@ -11,7 +11,7 @@ import cloudScanner
 from networkMap import NetworkMap
 from help_window import options_help, save_help
 from save import save
-
+import activeDirectory
 
 
 
@@ -25,6 +25,7 @@ scan_options = {
                 "Passive Scan": scanner.basicPassiveScan, 
                 "Active Scan": scanner.threadedScan,
                 "Arp Scan": ArpScanner.arpscan, 
+                "Active Directory Query": activeDirectory.queryActiveDirectory,
                 "AWS_scan": cloudScanner.aws_ec2_scan, 
                 "Azure_scan": cloudScanner.azure_vm_scan #doesnt work with manually entered credentials?
                 }

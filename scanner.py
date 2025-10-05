@@ -207,9 +207,10 @@ def basicPassiveScan(add_log, activeScanning, netMap, user_options=None):
         minSearch = user_options['rangeMin']
         maxSearch = user_options['rangeMax']
         scanRanges = getRanges(minSearch, maxSearch)
+        add_log(f"Scan range is from {minSearch} to {maxSearch}")
     else:
         scanRanges, minSearch, maxSearch = getScanRanges()
-    add_log(f"Scan range is from {minSearch} to {maxSearch}")
+        add_log(f"Your provided range was invalid, using range {minSearch} to {maxSearch}")
     nm = nmap.PortScanner()
     threadList = []
     for scanRange in scanRanges:
