@@ -20,12 +20,12 @@ def validateUserOptions(user_options):
     except Exception as e:
         rangeMaxValid = False
     try:
-        if int(user_options['intensity']) > 5 or int(user_options['intensity']) < 1:
+        if int(user_options['intensity']) > 5 or int(user_options['intensity']) <= 0:
             intensityValid = False
     except Exception as e:
         intensityValid = False
     try:
-        if int(user_options['timeout']) < 10:
+        if int(user_options['timeout']) < 5:
             timeoutValid = False
     except Exception as e:
         timeoutValid = False

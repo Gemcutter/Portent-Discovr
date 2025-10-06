@@ -10,9 +10,11 @@ def arpscan(add_log,activeScanning,netMap, user_options=None):
     address = socket.gethostbyname(hostname)
 
 
-    target = networkDetection.getSubnet() # change the 24 to the network's CIDR. 
+    network = networkDetection.getNetwork() # change the 24 to the network's CIDR. 
+    target = network["FullAddress"]
 
-    print("Scanning IP Range: " + target)
+
+    add_log("Scanning IP Range: " + target)
 
     # create ARP broadcast packet
     packet = Ether(dst="ff:ff:ff:ff:ff:ff") / ARP(pdst=target)
@@ -23,5 +25,7 @@ def arpscan(add_log,activeScanning,netMap, user_options=None):
             hostname = socket.gethostbyaddr(received.psrc)[0]
         except socket.herror:
             hostname = "Unknown"
-        print(f"{received.psrc}  {received.hwsrc}  {hostname}")
+        add_log(f"{received.psrc}  {received.hwsrc}  {hostname}")
+        netMap.addArp(received.psrc,[received.hwsrc,hostname])
+    add_log("Scan complete")
     activeScanning[0] = False

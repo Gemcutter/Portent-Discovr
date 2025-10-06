@@ -47,7 +47,7 @@ aws_region_codes = [
 def nice_disp(inst, var):
     return f'{var}: {inst[var]}'
 
-def aws_ec2_scan(args): #must have aws cli configured, add option to manually input access and secret keys
+def aws_ec2_scan(add_log, activeScanning, netMap, args): #must have aws cli configured, add option to manually input access and secret keys
     if args["use_env"] == 1: # use env variables
         client = boto3.client('ec2')
 
@@ -94,15 +94,14 @@ def aws_ec2_scan(args): #must have aws cli configured, add option to manually in
 
         add_log("-------------------------------")
         add_log("")
+        activeScanning[0] = False
 
 
-def azure_vm_scan(args):
+def azure_vm_scan(add_log, activeScanning, netMap, args):
     subscription_id = args["subscription_id"]
 
     credential = DefaultAzureCredential()
     compute_client = ComputeManagementClient(credential, subscription_id)
-
-
 
     # List all VMs in the subscription
     add_log("===============================")
@@ -111,3 +110,5 @@ def azure_vm_scan(args):
         add_log(f"VM Type: {vm.hardware_profile.vm_size}")
         add_log(f"Location: {vm.location}")
         add_log("-------------------------------")
+    
+    activeScanning[0] = False

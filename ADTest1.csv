@@ -1,0 +1,5 @@
+""
+""
+ip,name,os
+10.0.2.7,ADDC01,Windows Server 2022 Standard Evaluation
+10.0.2.100,TARGET-PC,Windows 10 Pro

@@ -1,13 +1,17 @@
-from tkinter import scrolledtext, ttk, messagebox, END, Tk, Menu, WORD, PhotoImage
-from customtkinter import CTkInputDialog, CTkToplevel, CTkButton, CTkEntry, CTkLabel, CTkComboBox, set_appearance_mode
+from tkinter import scrolledtext, ttk, END, Tk, Menu, WORD, PhotoImage, Toplevel
+from customtkinter import CTkButton, CTkEntry, CTkLabel, CTkComboBox, set_appearance_mode
 from time import localtime
 import sys, os
 
+import activeDirectory
 import scanner
 import threading
 import ArpScanner
 import cloudScanner
 from networkMap import NetworkMap
+from help_window import options_help, save_help
+from save import save
+import activeDirectory
 
 
 
@@ -18,12 +22,13 @@ activeScanning = [False]
 
 #name to display and function to use. {name: function}, no scanning functions are available yet so all are set to -1 and nothing accesses the dict
 scan_options = {
-                "Passive Scan": scanner.basicPassiveScan, 
-                "Active Scan": scanner.threadedScan,
-                "Arp Scan": ArpScanner.arpscan, 
-                "AWS_scan": cloudScanner.aws_ec2_scan, 
-                "Azure_scan": cloudScanner.azure_vm_scan #doesnt work with manually entered credentials?
-                }
+    "Passive Scan": scanner.basicPassiveScan, 
+    "Active Scan": scanner.threadedScan,
+    "Arp Scan": ArpScanner.arpscan, 
+    "Active Directory Query": activeDirectory.queryActiveDirectory,
+    "AWS_scan": cloudScanner.aws_ec2_scan, 
+    "Azure_scan": cloudScanner.azure_vm_scan #doesnt work with manually entered credentials?
+    }
 
 def resource_path(filename): #to get iconimage working
     if hasattr(sys, "_MEIPASS"):  # Running from PyInstaller bundle
@@ -32,24 +37,39 @@ def resource_path(filename): #to get iconimage working
 
 
 
-def execute():
+def execute(): #here be dragons
     global activeScanning
-    try: #its error time
+    try:
         if combobox.get():
             selected_scan = combobox.get()
             if selected_scan: #if there is a scan slelcted
-                if selected_scan in ["AWS_scan", "Azure_scan"]: #if aws scan chosen
-                    if selected_scan == "AWS_scan":
-                        results = cloud_login_window("AWS")
-                    elif selected_scan == "Azure_scan":
-                        results = cloud_login_window("Azure")
-
-
-                    if results["cancelled"] == 1:
-                        add_log("cloud login cancelled by user")
+                if selected_scan == "Active Directory Query":
+                    if activeScanning[0] == False:
+                        results = active_directory_window()
+                        if 'cancelled' in results.keys():
+                            add_log("cloud login cancelled by user")
+                        else:
+                            activeScanning[0] = True
+                            t = threading.Thread(target=scan_options[selected_scan], args=(add_log,activeScanning, netMap, results))
+                            t.start()
                     else:
-                        scan_options[selected_scan](results)
+                        add_log(f"scan already in progress")
+                elif selected_scan in ["AWS_scan", "Azure_scan"]: #if aws scan chosen
+                    if activeScanning[0] == False:
+                        if selected_scan == "AWS_scan":
+                            results = cloud_login_window("AWS")
+                        elif selected_scan == "Azure_scan":
+                            results = cloud_login_window("Azure")
 
+
+                        if results["cancelled"] == 1:
+                            add_log("cloud login cancelled by user")
+                        else:
+                            activeScanning[0] = True
+                            t = threading.Thread(target=scan_options[selected_scan], args=(add_log,activeScanning, netMap, results))
+                            t.start()
+                    else:
+                        add_log(f"scan already in progress")
                 else:
 # --------------------- this method is potentially dodgy and should be revisited. ----------------------
                     if activeScanning[0] == False:
@@ -67,15 +87,19 @@ def on_save():
         if log_box.get("1.0", "end-1c"): #if there is logged content
             name = file_name_query()
             if name:
-                add_log(f"Saved to file '{name}' successfully!") #doesnt save anything atm
+                save(name, netMap.toString(), log_box.get("1.0",END))
+                add_log(f"Saved file/s successfully!")
 
             else:
                 add_log("Save cancelled")
     else:
-        messagebox.showwarning("Scan in progress", "Scan in progress, please wait until it has finished")
+        add_log("-"*27)
+        add_log("Scan in progress, please wait until it has finished")
+        add_log("-"*27)
     
 
-def add_log(message):
+def add_log(message):    
+    root.update_idletasks()
     log_box.configure(state="normal") #enable temporarily to insert text
     log_box.insert(END, f"{time_now()} - {message}\n") #adds timestamp to line
     log_box.see(END)  # Auto-scroll to bottom
@@ -90,8 +114,39 @@ def on_exit():
     root.destroy()
 
 def file_name_query():
-    dialog = CTkInputDialog(text="Enter name of file to be saved", title="Save file") #possibly should add a check to see if file exists and warning if overwriting
-    return dialog.get_input()
+    dialog = save_file_query(text="Enter name to identify created files", title="Save file")
+    return dialog
+
+def save_file_query(text, title):
+    result = [None]
+    def ok():
+        result[0] = file_name_entry.get()
+        window.destroy()
+
+    def cancel():
+        window.destroy()
+
+    window = Toplevel(root)
+    window.title(title)
+    window.resizable(False,False)
+    window.attributes("-topmost", True)
+
+    label = CTkLabel(window, text=text)
+    label.grid(row=0, column=0, columnspan=2, padx=20, pady=20, sticky="ew")
+
+    file_name_entry = CTkEntry(window,placeholder_text="File Name:")
+    file_name_entry.grid(row=1, column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
+
+    ok = CTkButton(window, text="Ok", command= ok)
+    ok.grid(row=7,column=0, padx=(20, 10), pady=(0, 20))
+
+    cancel = CTkButton(window, text="Cancel", command= cancel)
+    cancel.grid(row=7,column=1, padx=(10, 20), pady=(0, 20))
+
+    window.wait_window()
+    
+    return result[0]
+
 
 def parse_to_dict(input_string):
     options_dict = {}
@@ -100,7 +155,7 @@ def parse_to_dict(input_string):
 
     for argument in split_in:
         key, arg = argument.split("=")
-        options_dict[key] = int(arg)
+        options_dict[key] = arg
 
     return options_dict
 
@@ -120,7 +175,6 @@ def cloud_login_window(mode): #my own worse CTkInputDialogue with 2 spaces for i
 
         if mode == "Azure":
             result["subscription_id"] = subscription_id_entry.get()
-            
 
         
         window.destroy()
@@ -135,7 +189,7 @@ def cloud_login_window(mode): #my own worse CTkInputDialogue with 2 spaces for i
         result["use_env"] = 1
         window.destroy()
 
-    window = CTkToplevel(root)
+    window = Toplevel(root)
     window.title(f"{mode} login")
     window.resizable(False,False)
     window.attributes("-topmost", True)
@@ -175,17 +229,74 @@ def cloud_login_window(mode): #my own worse CTkInputDialogue with 2 spaces for i
     
     return result
 
+def active_directory_window():
+    result = {"domainController": None, 
+              "baseDN": None, 
+              "username": None,
+              "password": None}
+
+    window = Toplevel(root)
+    window.title(f"active directory login")
+    window.resizable(False,False)
+    window.attributes("-topmost", True)
+
+    def cancel():
+        window.destroy()
+
+    def ok():
+        result["domainController"] = domainEntry.get()
+        result["baseDN"] = "DC=" + ",DC=".join(baseDNEntry.get().split("."))
+        result["username"] = usernameEntry.get()
+        result["password"] = passwordEntry.get()
+        window.destroy()
+
+    label = CTkLabel(window, text="Enter domain details. This is not saved")
+    label.grid(row=0, column=0, columnspan=2, padx=20, pady=20, sticky="ew")
+
+    domainEntry = CTkEntry(window,placeholder_text="Domain Controller:")
+    baseDNEntry = CTkEntry(window,placeholder_text="baseDN:")
+    usernameEntry = CTkEntry(window,placeholder_text="Username:")
+    passwordEntry = CTkEntry(window,placeholder_text="Password:")
+
+    domainEntry.grid(row=1,column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
+    baseDNEntry.grid(row=2,column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
+    usernameEntry.grid(row=3,column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
+    passwordEntry.grid(row=4,column=0, columnspan=2, padx=20, pady=(0, 20), sticky="ew")
+
+    ok_button = CTkButton(window, text="Ok", command= ok)
+    ok_button.grid(row=7,column=0, padx=(20, 10), pady=(0, 20))
+
+    cancel_button = CTkButton(window, text="Cancel", command= cancel)
+    cancel_button.grid(row=7,column=1, padx=(10, 20), pady=(0, 20))
+
+
+    window.wait_window()
+    
+    return result
+
+
+
+
+
+
 cloudScanner.add_log = add_log # set cloudscanner class output function
 
 # Main window
 root = Tk()
 root.title("Discovr")
 root.geometry("800x500")
-root.resizable(False, False)
+root.minsize(width=800, height=500)
 
 #change little icon
-iconimage = PhotoImage(file=resource_path("compiling/Triskele.png")) #TODO: broken, fix
+def resource_path(filename):
+    """Get absolute path to resource, works for dev and for PyInstaller bundle"""
+    if hasattr(sys, "_MEIPASS"):  # running as exe
+        return os.path.join(sys._MEIPASS, filename)
+    return os.path.join(os.path.abspath("."), filename)
+
+iconimage = PhotoImage(file=resource_path("Triskele.png"))
 root.iconphoto(True, iconimage)
+
 
 
 # Menu bar
@@ -195,9 +306,11 @@ filemenu = Menu(menubar, tearoff=0)
 filemenu.add_command(label="Save", command=on_save)
 filemenu.add_command(label="Exit", command=on_exit)
 menubar.add_cascade(label="File", menu=filemenu)
+#TODO add network info button
 
 helpmenu = Menu(menubar, tearoff=0)
-helpmenu.add_command(label="About", command=lambda: messagebox.showinfo(" ", "You wish")) #empty messagebox title due to size restraints
+helpmenu.add_command(label="Scan options", command=lambda: options_help(root))
+helpmenu.add_command(label="Saving/exporting", command=lambda: save_help(root))
 menubar.add_cascade(label="Help", menu=helpmenu)
 
 root.config(menu=menubar)
@@ -222,16 +335,16 @@ right_frame = ttk.Frame(content_frame)
 right_frame.pack(side="right", fill="both", expand=True, padx=10)
 
 CTkLabel(right_frame, text="Scan options:").grid(row=0, column=0, sticky="w")
-entry = CTkEntry(right_frame, placeholder_text="Enter in form: 'optionA=4 optionb=120...'", corner_radius=0, border_width=1, border_color="grey")#ttk.Entry(right_frame)
+entry = CTkEntry(right_frame, placeholder_text="Find details under help menu", corner_radius=0, border_width=1, border_color="grey")#ttk.Entry(right_frame)
 entry.grid(row=0, column=1, pady=5, sticky="ew")
 
-save_btn = CTkButton(right_frame, text="Save log to file", command= on_save)
+save_btn = CTkButton(right_frame, text="Save to file", command=on_save)
 save_btn.grid(row=1, column=0, pady=10, sticky="w")
 
-eval_btn = CTkButton(right_frame, text="Scan", command= execute) #no longer insecure :)
+eval_btn = CTkButton(right_frame, text="Scan", command=execute) 
 eval_btn.grid(row=1, column=1, pady=10, sticky="n")
 
-exit_btn = CTkButton(right_frame, text="Exit", command= on_exit)
+exit_btn = CTkButton(right_frame, text="Exit", command=on_exit)
 exit_btn.grid(row=1, column=2, pady=10, padx=(0,20), sticky="e")
 
 log_box = scrolledtext.ScrolledText( #its the wacky fake terminal log thingymajig
@@ -242,8 +355,7 @@ log_box = scrolledtext.ScrolledText( #its the wacky fake terminal log thingymaji
     fg="lime",
     state="disabled"  # start read-only
 )
-log_box.grid(row=2, column=0, columnspan=3)
-
+log_box.grid(row=2, column=0, columnspan=3, sticky="nesw")
 
 
 right_frame.columnconfigure(1, weight=1)

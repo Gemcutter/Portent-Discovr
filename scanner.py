@@ -1,4 +1,6 @@
-import nmap
+from modifiedLibs import nmap
+
+
 import socket
 import threading
 import time
@@ -85,17 +87,23 @@ def basicScan(add_log, activeScanning, netMap, user_options=None):
 
 
 
-def threadedScan(add_log, activeScanning, netMap, user_options={"rangeMin":"","rangeMax":"","intensity":4}):
+def threadedScan(add_log, activeScanning, netMap, user_options=None):
     '''
     this function takes range and intensity options
     threadedScan will do a primary scan and then complete a secondary scan for each host found,
     threading the secondary scans to run concurrently
     the obtained data is then added to the netMap object passed as a parameter
     '''
+    defaultOptions = {"rangeMin":"","rangeMax":"","intensity":4,"timeout":5}
+    for i in defaultOptions:
+        if i not in user_options:
+            user_options[i] = defaultOptions[i]
+
     rangeMinValid, rangeMaxValid, intensityValid, timeoutValid = validateUserOptions(user_options)
+    print(user_options)
     start = time.time()
     if rangeMinValid and rangeMaxValid:
-        minSearch = user_options['rangeMin']
+        minSearch = user_options['rangeMin']    
         maxSearch = user_options['rangeMax']
         scanRanges = getRanges(minSearch, maxSearch)
     else:
@@ -107,11 +115,18 @@ def threadedScan(add_log, activeScanning, netMap, user_options={"rangeMin":"","r
     # scan each range in scanRanges
     for scanRange in scanRanges:
         add_log("Now scanning range "+scanRange)
-        if intensityValid:
-            nm.scan(hosts=scanRange, arguments=f'-sn -n -PS --host-timeout 1000ms -T{user_options["intensity"]}')
+        if intensityValid and timeoutValid:
+            nm.scan(hosts=scanRange, arguments=f'-sn -n -PS --host-timeout {user_options["timeout"]}s -T{user_options["intensity"]}')
+        elif intensityValid and not timeoutValid:
+            add_log(f"Your provided timeout is invalid, using the default 5s")
+            nm.scan(hosts=scanRange, arguments=f'-sn -n -PS --host-timeout 5s -T{user_options["intensity"]}')
+        elif timeoutValid:
+            add_log(f"Your provided intensity is invalid, using the default 4")
+            nm.scan(hosts=scanRange, arguments=f'-sn -n -PS --host-timeout {user_options["timeout"]}s')
         else:
             add_log(f"Your provided intensity is invalid, using the default 4")
-            nm.scan(hosts=scanRange, arguments='-sn -n -PS --host-timeout 1000ms')
+            add_log(f"Your provided timeout is invalid, using the default 5s")
+            nm.scan(hosts=scanRange, arguments='-sn -n -PS --host-timeout 5s')
         add_log(scanRange+" primary scan complete")
         hosts_list = [(x, nm[x]['status']['state']) for x in nm.all_hosts()]
         hosts_list = mergeSortHostByValue(hosts_list) 
@@ -122,17 +137,21 @@ def threadedScan(add_log, activeScanning, netMap, user_options={"rangeMin":"","r
             add_log(host+': '+status)
             if status == "up":
                 myHostList.append(host)
-                if intensityValid:
-                    t = SecondaryScan(host, nm, user_options['intensity'])
+                if intensityValid and timeoutValid:
+                    t = SecondaryScan(host, nm, user_options['intensity'], user_options['timeout'])
+                elif intensityValid:
+                    t = SecondaryScan(host, nm, user_options['intensity'], 5)
+                elif timeoutValid:
+                    t = SecondaryScan(host, nm, 4, user_options['timeout'])
                 else:
-                    t = SecondaryScan(host, nm, 4)
+                    t = SecondaryScan(host, nm, 4, 5)
                 t.start()
                 threadList.append(t)
             
         for thread in threadList:
             thread.join()
-            add_log(" ".join(thread.result))
-            netMap.addHost(thread.result[0],thread.result[1])
+            add_log(f"{thread.result[0]} - device: {thread.result[1]}, accuracy: {thread.result[2]}")
+            netMap.addHost(thread.result[0],thread.result[1:])
         add_log("Scan Complete")
     activeScanning[0] = False
     print(f"Execution time: {time.time() - start:.6f} seconds")
@@ -145,28 +164,30 @@ class SecondaryScan(threading.Thread):
     It takes intensity as a parameter
     '''
 
-    def __init__(self, address, nm, intensity):
+    def __init__(self, address, nm, intensity, timeout):
         super().__init__()
         self.result = [address] 
         self.address = address
         self.nm = nm
         self.intensity = intensity
+        self.timeout = timeout
 
     def run(self):
-        OSguess = self.nm.scan(hosts=self.address, arguments=f'-O -T{self.intensity} --host-timeout 5000ms -Pn')
-        res = ""
+        OSguess = self.nm.scan(hosts=self.address, arguments=f'-O -T{self.intensity} --host-timeout {self.timeout}s -Pn')
         for ip in OSguess["scan"]:
             if 'osmatch' in OSguess["scan"][ip] and len(OSguess["scan"][ip]['osmatch'])>0:
                 for obj in OSguess["scan"][ip]['osmatch']:
-                    res+="\n - device: "+obj['name']+", accuracy: "+obj['accuracy']+'%'
+                    self.result.append(obj['name'])
+                    self.result.append(obj['accuracy']+"%")
+                    break
             else:
-                res+="OS not found"
+                self.result.append("OS not found")
+                self.result.append("100%")
         if len(OSguess["scan"]) < 1:
-            res+="OS not found"
+            self.result.append("OS not found")
+            self.result.append("100%")
 
-        self.result.append(res)
-
-def basicPassiveScan(add_log, activeScanning, netMap, user_options={"rangeMin":"","rangeMax":"","timeout":60}):
+def basicPassiveScan(add_log, activeScanning, netMap, user_options=None):
     '''
     Sniffs at all possible host ips waiting for responses.
     It will only find active hosts, not inactive hosts.
@@ -176,39 +197,44 @@ def basicPassiveScan(add_log, activeScanning, netMap, user_options={"rangeMin":"
     args for this function: optional range & optional timeout
     '''
     start = time.time()
-
+    defaultOptions = {"rangeMin":"","rangeMax":"","timeout":60}
+    for i in defaultOptions:
+        if i not in user_options:
+            user_options[i] = defaultOptions[i]
     rangeMinValid, rangeMaxValid, intensityValid, timeoutValid = validateUserOptions(user_options)
 
     if rangeMinValid and rangeMaxValid:
         minSearch = user_options['rangeMin']
         maxSearch = user_options['rangeMax']
         scanRanges = getRanges(minSearch, maxSearch)
+        add_log(f"Scan range is from {minSearch} to {maxSearch}")
     else:
         scanRanges, minSearch, maxSearch = getScanRanges()
-    add_log(f"Scan range is from {minSearch} to {maxSearch}")
+        add_log(f"Your provided range was invalid, using range {minSearch} to {maxSearch}")
     nm = nmap.PortScanner()
     threadList = []
     for scanRange in scanRanges:
-        add_log("Now scanning range "+scanRange)
         if timeoutValid:
+            add_log(f"Now scanning range {scanRange} with timeout {user_options['timeout']}")
             t = PassiveScan(scanRange, nm, user_options['timeout'])
         else:
+            add_log(f"Now scanning range {scanRange} with timeout 60")
             t = PassiveScan(scanRange, nm, 60)
         t.start()
         threadList.append(t)
     
     for t in threadList:
         t.join()
-        add_log(t.range+" primary scan complete")
+        add_log(t.range+" scan complete")
         for ip in t.result:
             if len(t.result[ip]) < 1:
                 continue
-            if t.result[ip][0]["device"] != "OS not found":
-                add_log(f"{ip} is probably {t.result[ip][0]['device']}")
+            if t.result[ip][0] != "OS not found":
+                add_log(f"{ip} is probably {t.result[ip][0]}")
             else:
                 add_log(f"{ip} OS is unknown")
             netMap.addHost(ip, t.result[ip])
-
+    
     activeScanning[0] = False
     print(netMap.toString())
     print(f"Execution time: {time.time() - start:.6f} seconds")
@@ -237,9 +263,11 @@ class PassiveScan(threading.Thread):
                 self.result[ip]=[]
                 if 'osmatch' in OSguess["scan"][ip] and len(OSguess["scan"][ip]['osmatch'])>0:
                     for obj in OSguess["scan"][ip]['osmatch']:
-                        self.result[ip].append({"device": obj['name'], "accuracy": f"{obj['accuracy']}%"})
+                        self.result[ip].append(obj['name'])
+                        self.result[ip].append(obj['accuracy']+"%")
                 else:
-                    self.result[ip].append({"device":"OS not found"})
+                    self.result[ip].append("OS not found")
+                    self.result[ip].append("100%")
         except Exception as e:
             print(e)
         

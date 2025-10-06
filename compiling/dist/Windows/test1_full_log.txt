@@ -1,0 +1,8 @@
+9:3:7 - beginning scan with args {'minRange': '192.168.20.65', 'maxRange': '192.168.20.20'}, this might take up to a few minutes
+9:3:8 - Scan range is from 192.168.20.0 to 192.168.20.255
+9:3:8 - Now scanning range 192.168.20.0-255 with timeout 60
+9:3:31 - 192.168.20.0-255 scan complete
+9:3:31 - 192.168.20.1 is probably Linux 2.6.32 - 3.10
+9:3:31 - 192.168.20.34 OS is unknown
+9:3:31 - 192.168.20.62 is probably Microsoft Windows 10 1607 - 11 23H2
+
