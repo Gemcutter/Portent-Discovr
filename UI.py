@@ -66,7 +66,7 @@ def execute(): #here be dragons
                             add_log("cloud login cancelled by user")
                         else:
                             activeScanning[0] = True
-                            t = threading.Thread(target=scan_options[selected_scan], args=(add_log,activeScanning, netMap, parse_to_dict(entry.get())))
+                            t = threading.Thread(target=scan_options[selected_scan], args=(add_log,activeScanning, netMap, results))
                             t.start()
                     else:
                         add_log(f"scan already in progress")
@@ -98,7 +98,8 @@ def on_save():
         add_log("-"*27)
     
 
-def add_log(message):
+def add_log(message):    
+    root.update_idletasks()
     log_box.configure(state="normal") #enable temporarily to insert text
     log_box.insert(END, f"{time_now()} - {message}\n") #adds timestamp to line
     log_box.see(END)  # Auto-scroll to bottom
@@ -284,7 +285,7 @@ cloudScanner.add_log = add_log # set cloudscanner class output function
 root = Tk()
 root.title("Discovr")
 root.geometry("800x500")
-#root.resizable(False, False)
+root.minsize(width=800, height=500)
 
 #change little icon
 def resource_path(filename):
