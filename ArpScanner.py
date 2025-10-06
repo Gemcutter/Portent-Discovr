@@ -10,7 +10,9 @@ def arpscan(add_log,activeScanning,netMap, user_options=None):
     address = socket.gethostbyname(hostname)
 
 
-    target = networkDetection.getSubnet() # change the 24 to the network's CIDR. 
+    network = networkDetection.getNetwork() # change the 24 to the network's CIDR. 
+    target = network["FullAddress"]
+
 
     add_log("Scanning IP Range: " + target)
 
