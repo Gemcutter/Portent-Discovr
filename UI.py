@@ -284,7 +284,7 @@ cloudScanner.add_log = add_log # set cloudscanner class output function
 root = Tk()
 root.title("Discovr")
 root.geometry("800x500")
-#root.resizable(False, False)
+root.minsize(width=800, height=500)
 
 #change little icon
 def resource_path(filename):
