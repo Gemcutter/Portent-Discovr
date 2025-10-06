@@ -306,6 +306,7 @@ filemenu = Menu(menubar, tearoff=0)
 filemenu.add_command(label="Save", command=on_save)
 filemenu.add_command(label="Exit", command=on_exit)
 menubar.add_cascade(label="File", menu=filemenu)
+#TODO add network info button
 
 helpmenu = Menu(menubar, tearoff=0)
 helpmenu.add_command(label="Scan options", command=lambda: options_help(root))
