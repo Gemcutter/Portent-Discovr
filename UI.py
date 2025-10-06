@@ -37,9 +37,9 @@ def resource_path(filename): #to get iconimage working
 
 
 
-def execute():
+def execute(): #here be dragons
     global activeScanning
-    try: #its error time
+    try:
         if combobox.get():
             selected_scan = combobox.get()
             if selected_scan: #if there is a scan slelcted
@@ -285,7 +285,7 @@ cloudScanner.add_log = add_log # set cloudscanner class output function
 root = Tk()
 root.title("Discovr")
 root.geometry("800x500")
-root.resizable(False, False)
+root.minsize(width=800, height=500)
 
 #change little icon
 def resource_path(filename):
@@ -354,8 +354,7 @@ log_box = scrolledtext.ScrolledText( #its the wacky fake terminal log thingymaji
     fg="lime",
     state="disabled"  # start read-only
 )
-log_box.grid(row=2, column=0, columnspan=3)
-
+log_box.grid(row=2, column=0, columnspan=3, sticky="nesw")
 
 
 right_frame.columnconfigure(1, weight=1)

@@ -1,0 +1,4 @@
+21:38:18 - ADDC01, DC=chris,DC=local, CHRIS\Administrator, W0nderfu1
+21:38:18 - IP: 10.0.2.7, Name: ADDC01, OS: Windows Server 2022 Standard Evaluation
+21:38:18 - IP: 10.0.2.100, Name: TARGET-PC, OS: Windows 10 Pro
+

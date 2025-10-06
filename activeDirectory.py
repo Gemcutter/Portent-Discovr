@@ -16,7 +16,8 @@ def queryActiveDirectory(add_log, activeScanning, netMap, inputs):
         username = inputs["username"]  
         password = inputs["password"]
 
-        add_log(f'{domainController}, {baseDN}, {username}, {password}')
+
+        #add_log(f'{domainController}, {baseDN}, {username}, {password}')
         server = Server(domainController, get_info=ALL)
         conn = Connection(server, user=username, password=password, auto_bind=True)
         conn.search(baseDN, '(objectClass=computer)', attributes=['name', 'dNSHostName', 'operatingSystem'])
@@ -32,7 +33,7 @@ def queryActiveDirectory(add_log, activeScanning, netMap, inputs):
                 except Exception:
                     ip = 'IP not found'
             add_log(f"IP: {ip}, Name: {name}, OS: {os}") #adds IP, Hostname and OS
-            netMap.addAQQ(ip, name, os) 
+            netMap.addADQ(ip, name, os) 
     except Exception as e: #If domain is not connected, or incorrect credentials are given
         add_log(f"Active Directory query failed: {e}")
 
