@@ -1,0 +1,14 @@
+17:55:1 - beginning scan with args {}, this might take up to a few minutes
+17:55:1 - Scanning IP Range: 192.168.1.4/24
+17:55:11 - 192.168.1.1  e4:fb:5d:16:70:c0  Unknown
+17:55:11 - 192.168.1.4  60:e3:2b:6a:2b:fb  Artemis-PC.home
+17:55:15 - 192.168.1.3  92:da:ca:90:da:ca  Unknown
+17:55:16 - 192.168.1.9  e4:fd:45:9e:9a:e4  2023E-PW033SXC
+17:55:17 - 192.168.1.6  92:da:ca:3d:ba:29  LenovoJoy
+17:55:21 - 192.168.1.5  54:60:09:3a:56:ce  Unknown
+17:55:26 - 192.168.1.7  b0:59:47:c3:d6:0f  Unknown
+17:55:31 - 192.168.1.13  98:b6:e9:65:c8:62  Unknown
+17:55:36 - 192.168.1.17  dc:68:eb:bd:54:68  Unknown
+17:55:36 - 192.168.1.26  9c:ae:d3:27:c2:10  EPSON27C210
+17:55:36 - Scan complete
+

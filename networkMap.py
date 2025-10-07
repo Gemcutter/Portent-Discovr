@@ -34,15 +34,19 @@ class NetworkMap:
     def toString(self):
         stringOut=""
         if len(self.data["devNAcc"].keys())>0:
-            stringOut += "ip, device, accuracy"
+            stringOut += "Active/Passive Scan\nip, device, accuracy"
             for ip in self.data["devNAcc"]:
                     stringOut+=f'\n{ip}, {self.data["devNAcc"].get(ip)[0]}, {self.data["devNAcc"].get(ip)[1]}'
         if len(self.data["nameNMAC"].keys())>0:
-            stringOut += "\n\nip, MAC, hostname"
+            if len(self.data["devNAcc"].keys())>0:
+                stringOut += "\n"
+            stringOut += "Arpscan\nip, MAC, hostname"
             for ip in self.data["nameNMAC"]:
                 stringOut+=f'\n{ip}, {self.data["nameNMAC"].get(ip)[0]}, {self.data["nameNMAC"].get(ip)[1]}'
         if len(self.data["ADQ"].keys())>0:
-            stringOut += "\n\nip, name, os"
+            if len(self.data["nameNMAC"].keys())>0:
+                stringOut += "\n"
+            stringOut += "Active Directory Query\nip, name, os"
             for ip in self.data["ADQ"]:
                 stringOut+=f'\n{ip}, {self.data["ADQ"].get(ip)[0]}, {self.data["ADQ"].get(ip)[1]}'
         return stringOut
