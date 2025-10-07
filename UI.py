@@ -285,7 +285,7 @@ cloudScanner.add_log = add_log # set cloudscanner class output function
 # Main window
 root = Tk()
 root.title("Discovr")
-root.geometry("800x500")
+root.geometry("1060x600")
 root.minsize(width=800, height=500)
 
 #change little icon
