@@ -9,7 +9,7 @@ import threading
 import ArpScanner
 import cloudScanner
 from networkMap import NetworkMap
-from help_window import options_help, save_help
+from help_window import options_help, save_help, info_help
 from save import save
 import activeDirectory
 
@@ -307,12 +307,15 @@ filemenu = Menu(menubar, tearoff=0)
 filemenu.add_command(label="Save", command=on_save)
 filemenu.add_command(label="Exit", command=on_exit)
 menubar.add_cascade(label="File", menu=filemenu)
-#TODO add network info button
 
 helpmenu = Menu(menubar, tearoff=0)
 helpmenu.add_command(label="Scan options", command=lambda: options_help(root))
 helpmenu.add_command(label="Saving/exporting", command=lambda: save_help(root))
 menubar.add_cascade(label="Help", menu=helpmenu)
+
+infomenu = Menu(menubar, tearoff=0)
+infomenu.add_command(label="Network", command=lambda: info_help(root))
+menubar.add_cascade(label="About", menu=infomenu)
 
 root.config(menu=menubar)
 
@@ -360,7 +363,7 @@ log_box.grid(row=2, column=0, columnspan=3, sticky="nesw")
 
 
 right_frame.columnconfigure(1, weight=1)
-
+right_frame.grid_rowconfigure(2, weight=1)
 
 
 

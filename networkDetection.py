@@ -48,8 +48,8 @@ def getNetwork():
     start, end = getNetworkRange(FullAddress)
     #print(f"Network: {FullAddress}")
     #print(f"Subnet mask: {subnetMask}")
-    print(f"Start IP: {start}")
-    print(f"End IP:   {end}")
+    #print(f"Start IP: {start}")
+    #print(f"End IP:   {end}")
 
     return {
         "FullAddress": FullAddress,

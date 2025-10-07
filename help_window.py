@@ -1,4 +1,5 @@
 import tkinter as tk
+from networkDetection import getNetwork
 
 def options_help(root):
     custom_variable_explanations = {
@@ -62,6 +63,24 @@ NAME_full_logs.txt will be a text file containing an exact copy of what is visib
     label.pack()
 
     textbox = tk.Text(window, height=8,wrap="word")
+    textbox.pack()
+    textbox.insert(tk.END, text)
+    textbox.configure(state="disabled")
+
+def info_help(root):
+    network = getNetwork()
+    window = tk.Toplevel(root)
+
+    text = f'''This computer's IP: {network["FullAddress"]}
+Subnet Mask: {network["subnetMask"]}
+Network Address: {network["start"]}
+Broadcast Address: {network["end"]}
+'''
+
+    label = tk.Label(window, text="About your network")
+    label.pack()
+
+    textbox = tk.Text(window, height=5,wrap="word")
     textbox.pack()
     textbox.insert(tk.END, text)
     textbox.configure(state="disabled")
