@@ -80,7 +80,7 @@ Broadcast Address: {network["end"]}
     label = tk.Label(window, text="About your network")
     label.pack()
 
-    textbox = tk.Text(window, height=5,wrap="word")
+    textbox = tk.Text(window, height=5,wrap="word", font=("Arial", 9))
     textbox.pack()
     textbox.insert(tk.END, text)
     textbox.configure(state="disabled")
