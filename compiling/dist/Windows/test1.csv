@@ -1,4 +1,0 @@
-192.168.20.1,[{'device': 'Linux 2.6.32 - 3.10','accuracy': '100%'}]
-192.168.20.34,[{'device': 'OS not found'}]
-192.168.20.62,[{'device': 'Microsoft Windows 10 1607 - 11 23H2','accuracy': '99%'},{'device': 'Microsoft Windows 10 1511','accuracy': '97%'},{'device': 'Windows 11 21H2','accuracy': '97%'},{'device': 'Windows Server 2022','accuracy': '97%'},{'device': 'Microsoft Windows 10 1703','accuracy': '96%'},{'device': 'Microsoft Windows 10 1703 or Windows 11 21H2','accuracy': '96%'},{'device': 'Microsoft Windows 10 1703 - 11 21H2','accuracy': '95%'},{'device': 'Microsoft Windows 11 21H2','accuracy': '95%'},{'device': 'Microsoft Windows 7 or 8.1 R1','accuracy': '94%'},{'device': 'Microsoft Windows 10 1607','accuracy': '94%'}]
-""

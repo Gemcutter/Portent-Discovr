@@ -11,3 +11,4 @@ Misc testing notes:
 --strip | might break things on windows
 optimise with upx
 --icon=Triskele.ico
+--noupx
