@@ -7,7 +7,7 @@ from azure.mgmt.compute import ComputeManagementClient
 
 
 add_log = None
-aws_region_codes = [
+aws_region_codes = [ #not currently used, will only scan ap-southeast-2
     "us-east-1",      # US East (N. Virginia)
     "us-east-2",      # US East (Ohio)
     "us-west-1",      # US West (N. California)
@@ -99,6 +99,7 @@ def aws_ec2_scan(add_log, activeScanning, netMap, args): #must have aws cli conf
         print(e)
     
     activeScanning[0] = False
+
 
 
 def azure_vm_scan(add_log, activeScanning, netMap, args):
