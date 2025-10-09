@@ -13,6 +13,7 @@ from help_window import options_help, save_help, info_help
 from save import save
 import activeDirectory
 
+raw_cloud_response = [None]
 
 
 netMap = NetworkMap()
@@ -62,12 +63,11 @@ def execute(): #here be dragons
                         elif selected_scan == "Azure_scan":
                             results = cloud_login_window("Azure")
 
-
                         if results["cancelled"] == 1:
                             add_log("cloud login cancelled by user")
                         else:
                             activeScanning[0] = True
-                            t = threading.Thread(target=scan_options[selected_scan], args=(add_log,activeScanning, netMap, results))
+                            t = threading.Thread(target=scan_options[selected_scan], args=(add_log,activeScanning, netMap, results, raw_cloud_response))
                             t.start()
                     else:
                         add_log(f"scan already in progress")
@@ -84,11 +84,12 @@ def execute(): #here be dragons
         add_log(e)
 
 def on_save():
+    print(raw_cloud_response[0])
     if activeScanning[0] == False:
         if log_box.get("1.0", "end-1c"): #if there is logged content
             name = file_name_query()
             if name:
-                save(name, netMap.toString(), log_box.get("1.0",END))
+                save(name, netMap.toString(), log_box.get("1.0",END), raw_cloud_response[0])
                 add_log(f"Saved file/s successfully!")
 
             else:
@@ -115,7 +116,7 @@ def on_exit():
     root.destroy()
 
 def file_name_query():
-    dialog = save_file_query(text="Enter name to identify created files", title="Save file")
+    dialog = save_file_query(text="Enter name to identify created file/s", title="Save file")
     return dialog
 
 def save_file_query(text, title):

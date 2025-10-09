@@ -1,5 +1,8 @@
 import csv
-def save(name, data, logs):
+import json
+
+
+def save(name, data, logs, raw_cloud_response):
     if len(data)>1:
         with open(f'{name}.csv', 'w', newline='') as file:
             writer = csv.writer(file)
@@ -7,3 +10,7 @@ def save(name, data, logs):
 
     with open(f'{name}_full_log.txt', 'w') as file:
         file.write(logs)
+
+    if raw_cloud_response != None:
+        with open(f'{name}_full_AWS_results.json', 'w') as json_file:
+            json.dump(raw_cloud_response, json_file, indent=4, default=str)

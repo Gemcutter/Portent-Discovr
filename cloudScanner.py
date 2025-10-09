@@ -47,7 +47,7 @@ aws_region_codes = [ #not currently used, will only scan ap-southeast-2
 def nice_disp(inst, var):
     return f'{var}: {inst[var]}'
 
-def aws_ec2_scan(add_log, activeScanning, netMap, args): #must have aws cli configured, add option to manually input access and secret keys
+def aws_ec2_scan(add_log, activeScanning, netMap, args, output_arr = None): #must have aws cli configured, add option to manually input access and secret keys
     try:
         if args["use_env"] == 1: # use env variables
             client = boto3.client('ec2')
@@ -61,6 +61,8 @@ def aws_ec2_scan(add_log, activeScanning, netMap, args): #must have aws cli conf
         
 
         results = client.describe_instances()
+
+        output_arr[0] = results
 
 
         for reservation in results['Reservations']:
@@ -102,7 +104,7 @@ def aws_ec2_scan(add_log, activeScanning, netMap, args): #must have aws cli conf
 
 
 
-def azure_vm_scan(add_log, activeScanning, netMap, args):
+def azure_vm_scan(add_log, activeScanning, netMap, args, output_arr = None):
     try:
         subscription_id = args["subscription_id"]
 

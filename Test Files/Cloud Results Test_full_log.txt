@@ -1,0 +1,41 @@
+17:18:43 - 
+17:18:43 - ===============================
+17:18:43 - ReservationId: r-0b40acbe62f11cb49
+17:18:43 - OwnerId: 007159206219
+17:18:43 - Groups: []
+17:18:43 - -------------------------------
+17:18:43 - InstanceType: t4g.micro
+17:18:43 - State: {'Code': 80, 'Name': 'stopped'}
+17:18:43 - InstanceId: i-017460cc20d346978
+17:18:43 - PlatformDetails: Linux/UNIX
+17:18:43 - Architecture: arm64
+17:18:43 - Tags: [{'Key': 'Name', 'Value': 'Test Instance 2'}]
+17:18:43 - LaunchTime: 2025-08-26 05:15:42+00:00
+17:18:43 - 
+17:18:43 - PrivateIpAddress: 172.31.43.182
+17:18:43 - Public IP: N.A.
+17:18:43 - PrivateDnsName: ip-172-31-43-182.ap-southeast-2.compute.internal
+17:18:43 - PublicDnsName: N.A.
+17:18:43 - -------------------------------
+17:18:43 - 
+17:18:43 - 
+17:18:44 - ===============================
+17:18:44 - ReservationId: r-0b5c06a962c267d8e
+17:18:44 - OwnerId: 007159206219
+17:18:44 - Groups: []
+17:18:44 - -------------------------------
+17:18:44 - InstanceType: t3.micro
+17:18:44 - State: {'Code': 80, 'Name': 'stopped'}
+17:18:44 - InstanceId: i-067282883d385ad19
+17:18:44 - PlatformDetails: Linux/UNIX
+17:18:44 - Architecture: x86_64
+17:18:44 - Tags: [{'Key': 'Name', 'Value': 'Test Instance'}]
+17:18:44 - LaunchTime: 2025-08-26 05:19:42+00:00
+17:18:44 - 
+17:18:44 - PrivateIpAddress: 172.31.31.26
+17:18:44 - Public IP: N.A.
+17:18:44 - PrivateDnsName: ip-172-31-31-26.ap-southeast-2.compute.internal
+17:18:44 - PublicDnsName: N.A.
+17:18:44 - -------------------------------
+17:18:44 - 
+
