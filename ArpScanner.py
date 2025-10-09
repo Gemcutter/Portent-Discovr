@@ -30,7 +30,7 @@ def arpscan(add_log,activeScanning,netMap, user_options=None):
             hostname = "Unknown"
         add_log(f"{received.psrc}  {received.hwsrc}  {hostname}")
         arpResults.append([received.psrc,[received.hwsrc,hostname]])
-    arpResults = mergeSortHostByValue(arpResults, True)
+    arpResults = mergeSortHostByValue(arpResults)
 
     for i in arpResults:
         netMap.addArp(i[0],i[1])
