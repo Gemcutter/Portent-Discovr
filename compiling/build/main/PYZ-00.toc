@@ -4049,6 +4049,10 @@
    'C:\\Users\\Thomas '
    'Rowsell\\AppData\\Roaming\\Python\\Python312\\site-packages\\matplotlib_inline\\config.py',
    'PYMODULE'),
+  ('mergeSort',
+   'C:\\Users\\Thomas '
+   'Rowsell\\Documents\\GitHub\\Portent-Discovr\\mergeSort.py',
+   'PYMODULE'),
   ('mimetypes', 'C:\\Python\\Python312\\Lib\\mimetypes.py', 'PYMODULE'),
   ('modifiedLibs', '-', 'PYMODULE'),
   ('modifiedLibs.nmap',
