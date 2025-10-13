@@ -285,91 +285,90 @@ cloudScanner.add_log = add_log # set cloudscanner class output function
 
 # Main window
 
-class UI_window():
-    root = Tk()
-    root.title("Discovr")
-    root.geometry("1060x600")
-    root.minsize(width=800, height=500)
+root = Tk()
+root.title("Discovr")
+root.geometry("1060x600")
+root.minsize(width=800, height=500)
 
-    #change little icon
-    def resource_path(filename):
-        """Get absolute path to resource, works for dev and for PyInstaller bundle"""
-        if hasattr(sys, "_MEIPASS"):  # running as exe
-            return os.path.join(sys._MEIPASS, filename)
-        return os.path.join(os.path.abspath("."), filename)
+#change little icon
+def resource_path(filename):
+    """Get absolute path to resource, works for dev and for PyInstaller bundle"""
+    if hasattr(sys, "_MEIPASS"):  # running as exe
+        return os.path.join(sys._MEIPASS, filename)
+    return os.path.join(os.path.abspath("."), filename)
 
-    iconimage = PhotoImage(file=resource_path("Triskele.png"))
-    root.iconphoto(True, iconimage)
-
-
-
-    # Menu bar
-    menubar = Menu(root)
-
-    filemenu = Menu(menubar, tearoff=0)
-    filemenu.add_command(label="Save", command=on_save)
-    filemenu.add_command(label="Exit", command=on_exit)
-    menubar.add_cascade(label="File", menu=filemenu)
-
-    helpmenu = Menu(menubar, tearoff=0)
-    helpmenu.add_command(label="Scan options", command=lambda: options_help(root))
-    helpmenu.add_command(label="Saving/exporting", command=lambda: save_help(root))
-    helpmenu.add_command(label="More about scans", command=lambda: more_about_scans_window(root))
-    menubar.add_cascade(label="Help", menu=helpmenu)
-
-    infomenu = Menu(menubar, tearoff=0)
-    infomenu.add_command(label="Network", command=lambda: info_help(root))
-    menubar.add_cascade(label="About", menu=infomenu)
+iconimage = PhotoImage(file=resource_path("Triskele.png"))
+root.iconphoto(True, iconimage)
 
 
 
-    root.config(menu=menubar)
+# Menu bar
+menubar = Menu(root)
 
-    # Main content frame
-    content_frame = ttk.Frame(root)
-    content_frame.pack(fill="both", expand=True, padx=5, pady=5)
+filemenu = Menu(menubar, tearoff=0)
+filemenu.add_command(label="Save", command=on_save)
+filemenu.add_command(label="Exit", command=on_exit)
+menubar.add_cascade(label="File", menu=filemenu)
 
-    # Left panel
-    left_frame = ttk.Frame(content_frame, width=200)
-    left_frame.pack(side="left", fill="y")
+helpmenu = Menu(menubar, tearoff=0)
+helpmenu.add_command(label="Scan options", command=lambda: options_help(root))
+helpmenu.add_command(label="Saving/exporting", command=lambda: save_help(root))
+helpmenu.add_command(label="More about scans", command=lambda: more_about_scans_window(root))
+menubar.add_cascade(label="Help", menu=helpmenu)
 
-    CTkLabel(left_frame, text="Scan type").pack(anchor="w")
-
-    combobox = CTkComboBox(left_frame, values=list(scan_options.keys()), state='readonly', corner_radius=0, border_width=1, border_color="grey")
-    combobox.set(list(scan_options.keys())[0])
-    combobox.pack()
-
-
-    # Right panel
-    right_frame = ttk.Frame(content_frame)
-    right_frame.pack(side="right", fill="both", expand=True, padx=10)
-
-    CTkLabel(right_frame, text="Scan options:").grid(row=0, column=0, sticky="w")
-    entry = CTkEntry(right_frame, placeholder_text="Find details under help menu", corner_radius=0, border_width=1, border_color="grey")#ttk.Entry(right_frame)
-    entry.grid(row=0, column=1, pady=5, sticky="ew")
-
-    save_btn = CTkButton(right_frame, text="Save to file", command=on_save)
-    save_btn.grid(row=1, column=0, pady=10, sticky="w")
-
-    eval_btn = CTkButton(right_frame, text="Scan", command=execute) 
-    eval_btn.grid(row=1, column=1, pady=10, sticky="n")
-
-    exit_btn = CTkButton(right_frame, text="Exit", command=on_exit)
-    exit_btn.grid(row=1, column=2, pady=10, padx=(0,20), sticky="e")
-
-    log_box = scrolledtext.ScrolledText( #its the wacky fake terminal log thingymajig
-        right_frame,
-        wrap=WORD,
-        font=("Courier New", 10),
-        bg="black",
-        fg="lime",
-        state="disabled"  # start read-only
-    )
-    log_box.grid(row=2, column=0, columnspan=3, sticky="nesw")
+infomenu = Menu(menubar, tearoff=0)
+infomenu.add_command(label="Network", command=lambda: info_help(root))
+menubar.add_cascade(label="About", menu=infomenu)
 
 
-    right_frame.columnconfigure(1, weight=1)
-    right_frame.grid_rowconfigure(2, weight=1)
+
+root.config(menu=menubar)
+
+# Main content frame
+content_frame = ttk.Frame(root)
+content_frame.pack(fill="both", expand=True, padx=5, pady=5)
+
+# Left panel
+left_frame = ttk.Frame(content_frame, width=200)
+left_frame.pack(side="left", fill="y")
+
+CTkLabel(left_frame, text="Scan type").pack(anchor="w")
+
+combobox = CTkComboBox(left_frame, values=list(scan_options.keys()), state='readonly', corner_radius=0, border_width=1, border_color="grey")
+combobox.set(list(scan_options.keys())[0])
+combobox.pack()
+
+
+# Right panel
+right_frame = ttk.Frame(content_frame)
+right_frame.pack(side="right", fill="both", expand=True, padx=10)
+
+CTkLabel(right_frame, text="Scan options:").grid(row=0, column=0, sticky="w")
+entry = CTkEntry(right_frame, placeholder_text="Find details under help menu", corner_radius=0, border_width=1, border_color="grey")#ttk.Entry(right_frame)
+entry.grid(row=0, column=1, pady=5, sticky="ew")
+
+save_btn = CTkButton(right_frame, text="Save to file", command=on_save)
+save_btn.grid(row=1, column=0, pady=10, sticky="w")
+
+eval_btn = CTkButton(right_frame, text="Scan", command=execute) 
+eval_btn.grid(row=1, column=1, pady=10, sticky="n")
+
+exit_btn = CTkButton(right_frame, text="Exit", command=on_exit)
+exit_btn.grid(row=1, column=2, pady=10, padx=(0,20), sticky="e")
+
+log_box = scrolledtext.ScrolledText( #its the wacky fake terminal log thingymajig
+    right_frame,
+    wrap=WORD,
+    font=("Courier New", 10),
+    bg="black",
+    fg="lime",
+    state="disabled"  # start read-only
+)
+log_box.grid(row=2, column=0, columnspan=3, sticky="nesw")
+
+
+right_frame.columnconfigure(1, weight=1)
+right_frame.grid_rowconfigure(2, weight=1)
 
 
 

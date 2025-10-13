@@ -1,4 +1,2 @@
-from UI import UI_window
-
-root = UI_window.root
+from UI import root
 root.mainloop()
