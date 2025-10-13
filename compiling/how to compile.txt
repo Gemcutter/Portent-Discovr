@@ -13,3 +13,4 @@ optimise with upx
 --icon=Triskele.ico
 --noupx
 --distpath "\dist\Windows"
+--clean
