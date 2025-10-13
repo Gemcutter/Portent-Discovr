@@ -9,7 +9,7 @@ import threading
 import ArpScanner
 import cloudScanner
 from networkMap import NetworkMap
-from help_window import options_help, save_help, info_help
+from help_window import options_help, save_help, info_help, more_about_scans_window
 from save import save
 import activeDirectory
 
@@ -312,11 +312,14 @@ menubar.add_cascade(label="File", menu=filemenu)
 helpmenu = Menu(menubar, tearoff=0)
 helpmenu.add_command(label="Scan options", command=lambda: options_help(root))
 helpmenu.add_command(label="Saving/exporting", command=lambda: save_help(root))
+helpmenu.add_command(label="More about scans", command=lambda: more_about_scans_window(root))
 menubar.add_cascade(label="Help", menu=helpmenu)
 
 infomenu = Menu(menubar, tearoff=0)
 infomenu.add_command(label="Network", command=lambda: info_help(root))
 menubar.add_cascade(label="About", menu=infomenu)
+
+
 
 root.config(menu=menubar)
 

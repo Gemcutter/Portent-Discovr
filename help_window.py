@@ -53,9 +53,10 @@ The order of options does not matter''',
 
 
 def save_help(root):
-    text = '''saving will create up to 2 files named NAME.csv and NAME_full_logs.txt where NAME is the given name
+    text = '''saving will create up to 3 files named NAME.csv, NAME_full_AWS_results.json and NAME_full_logs.txt where NAME is the given name
 
 NAME.csv will only be created if a network scan has been ran. Cloud scans will not add to NAME.csv
+NAME_full_AWS_results.json will be a json file containing the full results returned from Amazon
 NAME_full_logs.txt will be a text file containing an exact copy of what is visible in the UI log box
 '''
     window = tk.Toplevel(root)
@@ -87,4 +88,4 @@ Broadcast Address: {network["end"]}
     textbox.configure(state="disabled")
 
 def more_about_scans_window(root):
-    pass #TODO
+    pass #TODO More information about the uses and outputs of other scans
