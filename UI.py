@@ -373,5 +373,4 @@ right_frame.grid_rowconfigure(2, weight=1)
 
 
 if __name__ == "__main__":
-    root = UI_window.root
     root.mainloop()
