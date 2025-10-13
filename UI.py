@@ -313,7 +313,7 @@ menubar.add_cascade(label="File", menu=filemenu)
 helpmenu = Menu(menubar, tearoff=0)
 helpmenu.add_command(label="Scan options", command=lambda: options_help(root))
 helpmenu.add_command(label="Saving/exporting", command=lambda: save_help(root))
-helpmenu.add_command(label="More about scans", command=lambda: more_about_scans_window(root))
+helpmenu.add_command(label="More about 'non-scans'", command=lambda: more_about_scans_window(root))
 menubar.add_cascade(label="Help", menu=helpmenu)
 
 infomenu = Menu(menubar, tearoff=0)

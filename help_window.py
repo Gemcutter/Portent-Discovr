@@ -88,4 +88,28 @@ Broadcast Address: {network["end"]}
     textbox.configure(state="disabled")
 
 def more_about_scans_window(root):
-    pass #TODO More information about the uses and outputs of other scans
+    cloud_text = '''The AWS scan will print a summary of all ec2 reservations and instances with a more detailed json available to save
+
+The Azure scan only gives a very light summary of VMs and does not support in app authentication, requirering an account logged in to the azure cli to work. THIS SCAN IS EFFECTIVELY NON FUNCTIONAL
+'''
+    ad_text = '''The active directory query will retrieve details of devices within its domain. This requires both the presence of a domain controller and a set of valid credentials
+'''
+
+    window = tk.Toplevel(root)
+
+    cloud_label = tk.Label(window, text="Cloud Scans (AWS and Azure)")
+    cloud_label.pack()
+
+    cloud_textbox = tk.Text(window, height=7,wrap="word", font=("Arial", 9))
+    cloud_textbox.pack()
+    cloud_textbox.insert(tk.END, cloud_text)
+    cloud_textbox.configure(state="disabled")
+
+
+    ad_label = tk.Label(window, text="Active Directory Query")
+    ad_label.pack()
+
+    ad_textbox = tk.Text(window, height=3,wrap="word", font=("Arial", 9))
+    ad_textbox.pack()
+    ad_textbox.insert(tk.END, ad_text)
+    ad_textbox.configure(state="disabled")
