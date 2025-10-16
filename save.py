@@ -14,7 +14,3 @@ def save(name, data, logs, raw_cloud_response_dict):
     if raw_cloud_response_dict != None:
         with open(f'{name}_full_AWS_results.json', 'w') as jfile:
             json.dump(raw_cloud_response_dict, jfile, default=str, indent=4)
-
-    else:
-        with open(f'you dun goofed.txt', 'w') as fufile:
-            fufile.write("hahahahahahahahah end me now")

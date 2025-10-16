@@ -1,7 +1,7 @@
 Must be ran in terminal or console from this directory!!!
 
 Windows:
-pyinstaller --onefile --noconsole --distpath "\dist\Windows" --icon=Triskele.ico --name "Discovr" --add-data "..\Triskele.png;." ..\main.py
+pyinstaller --onefile --noconsole --distpath "C:\Users\Thomas Rowsell\Documents\GitHub\Portent-Discovr\compiling\dist\Windows" --icon=Triskele.ico --name "Discovr" --add-data "..\Triskele.png;." ..\main.py
 
 Linux:
 pyinstaller --onefile --noconsole --distpath "\dist\Linux" --icon=Triskele.ico --name "Discovr" --add-data "..\Triskele.png:." ..\main.py
