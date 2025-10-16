@@ -84,11 +84,12 @@ def execute(): #here be dragons
         add_log(e)
 
 def on_save():
-    print(raw_cloud_response[0])
     if activeScanning[0] == False:
         if log_box.get("1.0", "end-1c"): #if there is logged content
             name = file_name_query()
             if name:
+                add_log("does this even work?")
+                add_log(str(raw_cloud_response)) ## TODO remove
                 save(name, netMap.toString(), log_box.get("1.0",END), raw_cloud_response[0])
                 add_log(f"Saved file/s successfully!")
 
