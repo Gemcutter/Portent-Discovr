@@ -29,7 +29,6 @@ scan_options = {
     "Active Directory Query": activeDirectory.queryActiveDirectory,
     "AWS_scan": cloudScanner.aws_ec2_scan, 
     "Azure_scan": cloudScanner.azure_vm_scan, #doesnt work with manually entered credentials?
-    "Log Test":scanner.logTest
     }
 
 def resource_path(filename): #to get iconimage working

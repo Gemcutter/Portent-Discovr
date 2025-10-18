@@ -208,10 +208,6 @@ def basicPassiveScan(add_log, activeScanning, netMap, user_options=None):
     print(netMap.toString())
     print(f"Execution time: {time.time() - start:.6f} seconds")
 
-def logTest(add_log, activeScanning, netMap, user_options=None):
-    for i in range(100):
-        add_log(i)
-
 
 
 
