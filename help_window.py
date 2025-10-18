@@ -4,10 +4,10 @@ from networkDetection import getNetwork
 def options_help(root):
     custom_variable_explanations = {
         "Basic Info": 
-        '''Options are (as you may assume) optional. Reasonable defaults will be used if no options are provided. The default network scan range will cover the whole subnet that this device is connected to, but any custom IP range will work, including the normal internet. E.g. from 1.1.1.1 to 1.1.1.254. Note that if using a custom range both a min and a max must be specified, if only one is provided it will be ignored.
+        '''Options are (as you may assume) optional. Reasonable defaults will be used if no options are provided. The default network scan range will cover the immediate 256 devices around the ip that this device is connected to, but any custom IP range will work, including the normal internet. E.g. from 1.1.1.1 to 1.1.1.254. Note that if using a custom range both a min and a max must be specified, if only one is provided it will be ignored.
 Any options to be changed should be done in the following form:
 OPTION=VALUE OPTION2=VALUE ...
-Each option=value must be seperated by a space. Options ARE case sensitive.
+Each option=value must be separated by a space. Options ARE case sensitive.
 The order of options does not matter''',
         "Passive Scan": "rangeMin=x.x.x.x rangeMax=x.x.x.x \ntimeout=*scan time in seconds*",
         "Active Scan": "rangeMin=x.x.x.x rangeMax=x.x.x.x \nintensity=*0-5*",
@@ -64,7 +64,7 @@ NAME_full_logs.txt will be a text file containing an exact copy of what is visib
     label = tk.Label(window, text="Save/Export details")
     label.pack()
 
-    textbox = tk.Text(window, height=8,wrap="word")
+    textbox = tk.Text(window, height=8,wrap="word", font=("Arial", 9)   )
     textbox.pack()
     textbox.insert(tk.END, text)
     textbox.configure(state="disabled")
