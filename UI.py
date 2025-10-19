@@ -155,8 +155,12 @@ def parse_to_dict(input_string):
     split_in = input_string.split()
 
     for argument in split_in:
-        key, arg = argument.split("=")
-        options_dict[key] = arg
+        try:
+            key, arg = argument.split("=")
+            options_dict[key] = arg
+        
+        except Exception  as e:
+            add_log("Please make sure your user options are correctly formatted")
 
     return options_dict
 

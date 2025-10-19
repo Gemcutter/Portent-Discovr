@@ -79,4 +79,17 @@ Function - on_exit()
 Takes no parameters
 Purpose - kills the ui and prevents new scans from starting
 
+Function - file_name_query()
+Takes no parameters
+Purpose - prompts the user to provide a file name
+
+Function - save_file_query()
+Takes parameters - text, title
+Purpose - prompts the user to provide a file name
+
+Function - parse_to_dict()
+Takes parameters - input_string
+Purpose - parses the user input as a dictionary
+
+
 
