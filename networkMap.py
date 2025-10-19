@@ -6,6 +6,7 @@ class NetworkMap:
         "ADQ":{}
         }
         self.identifiedHosts = {}
+        self.continueScanning = True
     def addArp(self, ip, info):
         if ip in self.data["nameNMAC"]:
             if info[1] != "Unknown" and self.data["nameNMAC"].get(ip)[1] == "Unknown":

@@ -83,6 +83,9 @@ def threadedScan(add_log, activeScanning, netMap, user_options=None):
     myHostList=[]
     # scan each range in scanRanges
     for scanRange in scanRanges:
+        if (netMap.continueScanning==False) {
+            break
+        }
         add_log("Now scanning range "+scanRange)
         if intensityValid and timeoutValid:
             nm.scan(hosts=scanRange, arguments=f'-sn -n -PS --host-timeout {user_options["timeout"]}s -T{user_options["intensity"]}')

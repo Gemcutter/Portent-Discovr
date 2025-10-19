@@ -112,6 +112,7 @@ def time_now():
 
 def on_exit():
     root.destroy()
+    netMap.continueScanning=False
 
 def file_name_query():
     dialog = save_file_query(text="Enter name to identify created file/s", title="Save file")

@@ -1,0 +1,82 @@
+---------- save.py ----------
+Function - save()
+Takes parameters - name, data, logs, raw_cloud_response_dict
+Purpose - to save the logs and the data to separate files.
+
+---------- networkMap.py ----------
+Class - NetworkMap
+
+Function - Constructor 
+Takes no parameters 
+Purpose - set up data storage
+
+Function - addArp()
+Takes parameters - ip, info
+Purpose - adds an arp scan result to the data structure
+
+Function - addHost()
+Takes parameters - ip, info
+Purpose - adds an active or passive scan result to the data structure
+
+Function - addADQ()
+Takes parameters - ip, name, os
+Purpose - adds an Active directory query scan result to the data structure
+
+Function - toString()
+Takes no parameters
+Purpose - converts the entire stored data structure into a csv format for saving
+
+implemented but not used:
+
+Function - getHost()
+Takes parameters - ip
+Purpose - returns the data from a requested host
+
+Function - getAllHosts()
+Takes no parameters
+Purpose - returns all hosts identified by active or passive scans
+
+Function - getRelevantData()
+Takes no parameters
+Purpose - returns all hosts that had an operating system identified by a scan
+
+---------- mergeSort.py ----------
+Function - mergeSortHostByValue()
+Takes parameters - list of hosts
+Purpose - sorts a list of hosts by their host ip
+
+---------- ValidateUserOptions.py ----------
+Function - validateUserOptions()
+Takes parameters - user_options
+Purpose - Checks if the user provided inputs are formatted correctly and have valid values.
+
+Function - compareIpValues()
+Takes parameters - min, max
+Purpose - Checks if the first of two ip's is smaller than the second.
+
+---------- UI.py ----------
+Function - resource_path()
+Takes parameters - filename
+Purpose - gets the path for a filename
+
+Function - execute()
+Takes no parameters
+Purpose - Runs a scan selected by the user, with provided user_options
+
+Function - on_save()
+Takes no parameters
+Purpose - Attempts to save the current data
+
+Function - add_log()
+Takes parameters - message
+Purpose - logs a message to the terminal
+
+Function - time_now()
+Takes no parameters
+Purpose - returns the current time formatted for the logs
+
+Function - on_exit()
+Takes no parameters
+Purpose - kills the ui and prevents new scans from starting
+
+
