@@ -54,9 +54,9 @@ def aws_ec2_scan(add_log, activeScanning, netMap, args, output_arr = None): #mus
 
         else: # use entered variables
             client = boto3.client('ec2',
-                                aws_access_key_id=args["access_key"],
-                                aws_secret_access_key=args["secret_key"],
-                                region_name="ap-southeast-2") # temporary fix
+            aws_access_key_id=args["access_key"],
+            aws_secret_access_key=args["secret_key"],
+            region_name="ap-southeast-2") # temporary fix
 
         
 

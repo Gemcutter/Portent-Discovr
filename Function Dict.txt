@@ -91,5 +91,82 @@ Function - parse_to_dict()
 Takes parameters - input_string
 Purpose - parses the user input as a dictionary
 
+Function - cloud_login_window()
+Takes parameters - mode
+Purpose - take inputs from custom input dialogue
 
+Function - active_directory_window()
+Takes no parameters
+Purpose - take inputs from custom input dialogue
 
+Function - resource_path()
+Takes parameters - filename
+Purpose - get absolute path to resource
+
+---------- scanner.py ----------
+Function - basicScan() DEPRECATED
+Takes parameters - add_log, activeScanning, netMap, user_options
+Purpose - does a primary and secondary scan on a range
+
+Function - threadedScan()
+Takes parameters - add_log, activeScanning, netMap, user_options
+Purpose - does a primary scan on a range, then does threaded secondary scans for each found host
+
+Function - basicPassiveScan()
+Takes parameters - add_log, activeScanning, netMap, user_options
+Purpose - performs a number of simultaneous threaded passive scans on a network
+
+Function - getRanges()
+Takes parameters - min, max
+Purpose - returns a list of ranges from a set minimum and a set maximum broken into sets of 256
+
+Function - decimalToBinary()
+Takes parameters - number
+Purpose - converts a decimal value to binary
+
+Function - binaryToDecimal()
+Takes parameters - number
+Purpose - converts a binary value to decimal
+
+Function - getDefaultInterface()
+Takes no parameters
+Purpose - returns the subnet mask
+
+Function - getScanRanges()
+Takes no parameters
+Purpose - calculates and returns the minimum and maximum ip addresses, returns a set of ranges from getRanges()
+
+---------- cloudScanner.py ----------
+Function - nice_disp()
+Takes parameters - inst, var
+Purpose - reformats an instance and variable for logging
+
+Function - aws_ec2_scan()
+Takes parameters - add_log, activeScanning, netMap, args, output_arr
+Purpose - scan and display results from AWS 
+
+Function - azure_vm_scan()
+Takes parameters - add_log, activeScanning, netMap, args, output_arr
+Purpose - scan and display results from Azure
+
+---------- helpWindow.py ----------
+Function - options_help()
+Takes parameters - root
+Purpose - builds a help menu button on the tab bar for options
+
+Function - save_help()
+Takes parameters - root
+Purpose - builds a help menu button on the tab bar for saving
+
+Function - info_help()
+Takes parameters - root
+Purpose - builds a help menu button on the tab bar for network info
+
+Function - more_about_scans_window()
+Takes parameters - root
+Purpose - builds a help menu button on the tab bar for scans
+
+---------- ArpScanner.py ----------
+Function - arpscan()
+Takes parameters - add_log,activeScanning,netMap, user_options
+Purpose - scan a network using arp, return sorted results
