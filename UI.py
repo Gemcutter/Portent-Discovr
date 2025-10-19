@@ -294,12 +294,6 @@ root.geometry("1060x600")
 root.minsize(width=800, height=500)
 
 #change little icon
-def resource_path(filename):
-    """Get absolute path to resource, works for dev and for PyInstaller bundle"""
-    if hasattr(sys, "_MEIPASS"):  # running as exe
-        return os.path.join(sys._MEIPASS, filename)
-    return os.path.join(os.path.abspath("."), filename)
-
 iconimage = PhotoImage(file=resource_path("Triskele.png"))
 root.iconphoto(True, iconimage)
 
