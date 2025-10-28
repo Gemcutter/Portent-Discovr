@@ -4,7 +4,8 @@ Windows:
 pyinstaller --onefile --noconsole --distpath "C:\Users\Thomas Rowsell\Documents\GitHub\Portent-Discovr\compiling\dist\Windows" --icon=Triskele.ico --name "Discovr" --add-data "..\Triskele.png;." ..\main.py
 
 Linux:
-pyinstaller --onefile --noconsole --distpath "\dist\Linux" --icon=Triskele.ico --name "Discovr" --add-data "..\Triskele.png:." ..\main.py
+WILL NOT COMPILE. SHENANIGANS WERE NEEDED TO COMPILE CURRENT LINUX VERSION
+pyinstaller --onefile --noconsole --icon=Triskele.ico --name "Discovr" --add-data "../Triskele.png:." ../main.py
 
 
 Misc testing notes:
